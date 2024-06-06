@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from 'src/usuario/usuario.service';
 
@@ -13,18 +13,19 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
     try {
       if (!user) {
-        throw new UnauthorizedException('Usuario no encontrado');
+        throw new UnauthorizedException('Usuario not found');
       } else if (user.contrasena !== pass) {
-        throw new UnauthorizedException('Contraseña incorrecta');
+        throw new UnauthorizedException('Contrasena equivocada');
       } else {
         console.log('pasate');
-        const payLoad = { email: user.email, password: user.contrasena };
+        const payLoad = { user };
         return {
           access_token: await this.jwtService.signAsync(payLoad),
         };
       }
     } catch (err) {
       console.log(err);
+      Logger.error(err);
     }
 
     // if (user?.contrasena !== pass) {
