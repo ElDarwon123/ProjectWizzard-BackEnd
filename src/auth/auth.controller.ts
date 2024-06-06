@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -12,7 +13,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './auth.guard';
-// autenticationn
+// autenticatio
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
