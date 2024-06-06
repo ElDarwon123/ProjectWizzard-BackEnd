@@ -26,6 +26,7 @@ export class AuthController {
       createAuthDto.contrasena,
     );
   }
+  // profile 
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
