@@ -6,10 +6,12 @@ import { usuarioSchema } from './schema/usuario.schema';
 import { RoleModule } from 'src/role/role.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: "Usuario", schema: usuarioSchema }]),
-  RoleModule
+  imports: [
+    MongooseModule.forFeature([{ name: 'Usuario', schema: usuarioSchema }]),
+    RoleModule,
   ],
   controllers: [UsuarioController],
   providers: [UsuarioService],
+  exports: [UsuarioService],
 })
 export class UsuarioModule {}

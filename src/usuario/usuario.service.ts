@@ -7,11 +7,12 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class UsuarioService {
+  constructor(
+    @InjectModel('Usuario') private readonly usuarioModel: Model<Usuario>,
+  ) {}
 
-  constructor(@InjectModel('Usuario') private readonly usuarioModel: Model<Usuario>) { }
-  
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
-    const newUser = new this.usuarioModel(createUsuarioDto)
+    const newUser = new this.usuarioModel(createUsuarioDto);
     await newUser.save();
     return newUser.populate('role');
   }
@@ -26,13 +27,27 @@ export class UsuarioService {
     return user;
   }
 
+  async findByEmail(email: string) {
+    const user = await this.usuarioModel
+      .findOne({ email })
+      .populate('role')
+      .exec();
+    return user;
+  }
+
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
-    const updateUser = (await this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {new: true})).populated('role').exec()
+    const updateUser = (
+      await this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {
+        new: true,
+      })
+    )
+      .populated('role')
+      .exec();
     return updateUser;
   }
 
   async remove(id: string) {
-    const delUser = await this.usuarioModel.findByIdAndDelete(id).exec()
+    const delUser = await this.usuarioModel.findByIdAndDelete(id).exec();
     return delUser;
   }
 }
