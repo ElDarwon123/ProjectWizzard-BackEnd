@@ -1,6 +1,7 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from 'src/usuario/usuario.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -11,10 +12,14 @@ export class AuthService {
 
   async singIn(email: string, pass: string): Promise<{ access_token: string }> {
     const user = await this.userService.findByEmail(email);
+    const validUser = await this.userService.validateUser(email, pass);
+    const hash = await bcrypt.hash(pass, 10);
+    const isMatch = await bcrypt.compare(pass, hash);
+
     try {
       if (!user) {
         throw new UnauthorizedException('Usuario not found');
-      } else if (user.contrasena !== pass) {
+      } else if (!isMatch) {
         throw new UnauthorizedException('Contrasena equivocada');
       } else {
         console.log('pasate');
@@ -27,12 +32,5 @@ export class AuthService {
       console.log(err);
       Logger.error(err);
     }
-
-    // if (user?.contrasena !== pass) {
-    //   throw new UnauthorizedException();
-    // }
-
-    // const { ...result } = user;
-    // return result;
   }
 }

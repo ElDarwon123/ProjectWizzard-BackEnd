@@ -50,4 +50,12 @@ export class UsuarioService {
     const delUser = await this.usuarioModel.findByIdAndDelete(id).exec();
     return delUser;
   }
+
+  async validateUser(email: string, pass: string): Promise<Usuario | null> {
+    const user = await this.usuarioModel.findOne({ email }).exec();
+    if (user && (await user.comparePassword(pass))) {
+      return user;
+    }
+    return null;
+  }
 }
