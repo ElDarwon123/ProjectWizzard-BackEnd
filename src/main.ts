@@ -9,7 +9,7 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept'
+    allowedHeaders: 'Authorization, Content-Type, Accept',
   });
   const conf = new DocumentBuilder()
     .setTitle('AgroEmprende')
