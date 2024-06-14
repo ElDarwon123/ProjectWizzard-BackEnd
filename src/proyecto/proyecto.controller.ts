@@ -1,5 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } 
+from '@nestjs/common';
 import { ProyectoService } from './proyecto.service';
+import { CreateProyectoDto } from './dtos/create.proyecto.dto';
+import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
 import { Proyecto } from './schema/proyecto.shema';
 
 @Controller('proyectos')
@@ -7,27 +10,29 @@ export class ProyectoController {
   constructor(private readonly proyectoService: ProyectoService) {}
 
   @Post()
-  create(@Body() createProyectoDto: Proyecto) {
+  @UsePipes(new ValidationPipe())
+  create(@Body() createProyectoDto: CreateProyectoDto): Promise<Proyecto> {
     return this.proyectoService.create(createProyectoDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Proyecto[]> {
     return this.proyectoService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<Proyecto> {
     return this.proyectoService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProyectoDto: Proyecto) {
+  @UsePipes(new ValidationPipe())
+  update(@Param('id') id: string, @Body() updateProyectoDto: UpdateProyectoDto): Promise<Proyecto> {
     return this.proyectoService.update(id, updateProyectoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<Proyecto> {
     return this.proyectoService.remove(id);
   }
 }
