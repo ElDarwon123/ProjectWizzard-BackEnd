@@ -18,9 +18,9 @@ export class AuthService {
 
     try {
       if (!user) {
-        throw new UnauthorizedException('Usuario not found');
+        throw new UnauthorizedException('User not found');
       } else if (!isMatch) {
-        throw new UnauthorizedException('Contrasena equivocada');
+        throw new UnauthorizedException('Invalid Credentials');
       } else {
         console.log('pasate');
         const payLoad = { user };

@@ -32,4 +32,9 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.usuario;
   }
+
+  @Get()
+  enableCrud(role: string) {
+    
+  }
 }

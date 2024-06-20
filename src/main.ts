@@ -17,8 +17,8 @@ async function bootstrap() {
     .setVersion('1.0.0')
     .addTag('project')
     .build();
-  const doc = SwaggerModule.createDocument(app, conf)
-  SwaggerModule.setup('api', app, doc)
+  const doc = SwaggerModule.createDocument(app, conf);
+  SwaggerModule.setup('api', app, doc);
   // configuración para env
   app.useGlobalPipes(new ValidationPipe());
   const config = app.get(ConfigService);
