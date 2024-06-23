@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } 
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseGuards } 
 from '@nestjs/common';
 import { ProyectoService } from './proyecto.service';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
 import { Proyecto } from './schema/proyecto.shema';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('proyectos')
+@UseGuards(AuthGuard) // Aplicar el guardia a nivel de clase
 export class ProyectoController {
   constructor(private readonly proyectoService: ProyectoService) {}
 
