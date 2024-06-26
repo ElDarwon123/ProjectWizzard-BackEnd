@@ -1,5 +1,6 @@
-import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { Types } from 'mongoose';
+import { RolesEnum } from 'src/enums/role.enum';
 
 // poner la fecha de nacimiento tipo Date, or ahora se crea atomaticamente
 /*
@@ -7,6 +8,8 @@ import { Types } from 'mongoose';
     @IsOptional()
     fechaNacimiento?: Date;
   */
+
+
 export class CreateUsuarioDto {
   @IsString()
   @IsNotEmpty()
@@ -15,7 +18,7 @@ export class CreateUsuarioDto {
   @IsNotEmpty()
   apellido: string;
   @IsString()
-  @IsNotEmpty()
+  @IsEmail()
   email: string;
   @IsString()
   @IsNotEmpty()
@@ -28,6 +31,6 @@ export class CreateUsuarioDto {
   @IsNotEmpty()
   contrasena: string;
   @IsNotEmpty()
-  @IsMongoId()
-  role: Types.ObjectId;
+  @IsEnum(RolesEnum)
+  role: string;
 }

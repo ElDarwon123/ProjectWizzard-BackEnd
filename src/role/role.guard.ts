@@ -1,2 +1,0 @@
-// auth.middleware.ts
-

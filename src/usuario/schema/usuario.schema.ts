@@ -31,8 +31,8 @@ export class Usuario extends Document {
   })
   contrasena: string;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Role' })
-  role: Role;
+  @Prop({ required: true })
+  role: string;
 
   comparePassword: (password: string) => Promise<boolean>;
 }

@@ -23,7 +23,7 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Credentials');
       } else {
         console.log('pasate');
-        const payLoad = { user };
+        const payLoad = { sub: user.id, role: user.role };
         return {
           access_token: await this.jwtService.signAsync(payLoad),
         };
