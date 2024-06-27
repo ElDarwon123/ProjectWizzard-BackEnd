@@ -10,6 +10,10 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesEnum } from 'src/enums/role.enum';
 
 @Controller('proyectos')
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(RolesEnum.Aprendiz) //a nivel de clase
+
+
 export class ProyectoController {
   constructor(private readonly proyectoService: ProyectoService) {}
 
@@ -20,8 +24,6 @@ export class ProyectoController {
   }
 
   @Get()
-  @Roles(RolesEnum.Aprendiz)
-  @UseGuards(AuthGuard, RolesGuard)
   findAll(): Promise<Proyecto[]> {
     return this.proyectoService.findAll();
   }
