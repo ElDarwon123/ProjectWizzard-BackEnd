@@ -29,6 +29,10 @@ export class UpdateProyectoDto {
   @IsOptional()
   eje_estrategico?: string;
 
+
+
+  
+
   @IsString()
   @IsOptional()
   estado?: string;

@@ -22,6 +22,9 @@ export class CreateProyectoDto {
   @IsString()
   eje_estrategico: string;
 
+
+  
+
   @IsString()
   estado: string;
 
