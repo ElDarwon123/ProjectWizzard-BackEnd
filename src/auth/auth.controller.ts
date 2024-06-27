@@ -12,7 +12,7 @@ import {
 //import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from './guards/auth.guard';
 // autenticatio
 @Controller('auth')
 export class AuthController {
@@ -30,11 +30,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.usuario;
+    return req.user;
   }
 
-  @Get()
-  enableCrud(role: string) {
-    
-  }
 }

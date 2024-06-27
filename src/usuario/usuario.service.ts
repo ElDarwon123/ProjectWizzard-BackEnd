@@ -14,24 +14,22 @@ export class UsuarioService {
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     const newUser = new this.usuarioModel(createUsuarioDto);
     await newUser.save();
-    return newUser.populate('role');
+    return newUser;
   }
 
   async findAll(): Promise<Usuario[]> {
-    const usuarios = await this.usuarioModel.find().populate('role').exec();
+    const usuarios = await this.usuarioModel.find();
     return usuarios;
   }
 
   async findOne(id: string) {
-    const user = await this.usuarioModel.findById(id).populate('role').exec();
+    const user = await this.usuarioModel.findById(id);
     return user;
   }
 
   async findByEmail(email: string) {
     const user = await this.usuarioModel
       .findOne({ email })
-      .populate('role')
-      .exec();
     return user;
   }
 
@@ -40,19 +38,17 @@ export class UsuarioService {
       await this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {
         new: true,
       })
-    )
-      .populated('role')
-      .exec();
+    );
     return updateUser;
   }
 
   async remove(id: string) {
-    const delUser = await this.usuarioModel.findByIdAndDelete(id).exec();
+    const delUser = await this.usuarioModel.findByIdAndDelete(id);
     return delUser;
   }
 
   async validateUser(email: string, pass: string): Promise<Usuario | null> {
-    const user = await this.usuarioModel.findOne({ email }).exec();
+    const user = await this.usuarioModel.findOne({ email });
     if (user && (await user.comparePassword(pass))) {
       return user;
     }
