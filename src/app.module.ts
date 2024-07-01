@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoleModule } from './role/role.module';
 import { AuthModule } from './auth/auth.module';
 import { ProyectoModule } from './proyecto/proyecto.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ProyectoModule } from './proyecto/proyecto.module';
     RoleModule,
     AuthModule,
     ProyectoModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
