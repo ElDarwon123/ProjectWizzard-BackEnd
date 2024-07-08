@@ -1,11 +1,9 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsMongoId, IsNumber, IsString } from 'class-validator';
 
 export class CreateProyectoDto {
   @IsNumber()
   fase_idFase: number;
 
-  @IsString()
-  titulo: string;
 
   @IsString()
   fecha_creacion: string;
@@ -22,18 +20,7 @@ export class CreateProyectoDto {
   @IsString()
   eje_estrategico: string;
 
+  @IsMongoId()
+  usuario_id_asignado: string;
 
-  
-
-  @IsString()
-  estado: string;
-
-  @IsNumber()
-  categoria_idCategoria: number;
-
-  @IsNumber()
-  convocatoria_idConvocatoria: number;
-
-  @IsNumber()
-  usuario_id_asignado: number;
 }

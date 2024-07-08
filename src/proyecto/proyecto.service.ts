@@ -5,10 +5,17 @@ import { Proyecto } from './schema/proyecto.shema';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
 
+import { UsuarioService } from 'src/usuario/usuario.service';
+
+
+
 @Injectable()
 export class ProyectoService {
   constructor(
     @InjectModel(Proyecto.name) private proyectoModel: Model<Proyecto>,
+
+    private readonly usuarioService : UsuarioService,
+    
   ) {}
 
   async findAll(): Promise<Proyecto[]> {

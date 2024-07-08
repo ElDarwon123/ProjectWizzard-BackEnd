@@ -1,13 +1,9 @@
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber,IsMongoId, IsString, IsOptional } from 'class-validator';
 
 export class UpdateProyectoDto {
   @IsNumber()
   @IsOptional()
   fase_idFase?: number;
-
-  @IsString()
-  @IsOptional()
-  titulo?: string;
 
   @IsString()
   @IsOptional()
@@ -29,23 +25,8 @@ export class UpdateProyectoDto {
   @IsOptional()
   eje_estrategico?: string;
 
-
-
-  
-
-  @IsString()
   @IsOptional()
-  estado?: string;
+  @IsMongoId()
+  usuario_id_asignado?: string;
 
-  @IsNumber()
-  @IsOptional()
-  categoria_idCategoria?: number;
-
-  @IsNumber()
-  @IsOptional()
-  convocatoria_idConvocatoria?: number;
-
-  @IsNumber()
-  @IsOptional()
-  usuario_id_asignado?: number;
 }

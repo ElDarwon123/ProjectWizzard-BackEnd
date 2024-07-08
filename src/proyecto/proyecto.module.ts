@@ -9,8 +9,14 @@ import { ProyectoService } from './proyecto.service';
 import { ProyectoController } from './proyecto.controller';
 import { Proyecto, ProyectoSchema } from './schema/proyecto.shema';
 
+import { UsuarioModule } from '../usuario/usuario.module';
+
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Proyecto.name, schema: ProyectoSchema }])],
+  imports: [MongooseModule.forFeature([{ name: Proyecto.name, schema: ProyectoSchema }]),
+  
+UsuarioModule
+],
+
   providers: [ProyectoService],
   controllers: [ProyectoController],
 })

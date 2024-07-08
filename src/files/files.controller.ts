@@ -39,7 +39,7 @@ export class FilesController {
     if (!file) {
       throw new BadRequestException('File is not received');
     }
-    return this.filesService.create(file);
+    return this.filesService.create(file)
   }
 }
 
