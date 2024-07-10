@@ -11,7 +11,7 @@ export class Usuario extends Document {
   @Prop({ required: true })
   apellido: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ required: true })
@@ -34,12 +34,13 @@ export class Usuario extends Document {
   @Prop({ required: true })
   role: string;
 
-  comparePassword: (password: string) => Promise<boolean>;
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);
-usuarioSchema.methods.comparePassword = async function (
-  password: string,
-): Promise<boolean> {
-  return await bcrypt.compare(password, this.contrasena);
-};
+
+usuarioSchema.pre<Usuario>('save', async function (next) {
+  if (this.isModified('password')) {
+    this.contrasena = await bcrypt.hash(this.contrasena, 10);
+  }
+  next();
+});
