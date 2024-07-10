@@ -13,7 +13,7 @@ async function bootstrap() {
   });
   const conf = new DocumentBuilder()
     .setTitle('AgroEmprende')
-    .setDescription('its a formative project')
+    .setDescription("it's a formative project")
     .setVersion('1.21.0')
     .addTag('project')
     .build();
