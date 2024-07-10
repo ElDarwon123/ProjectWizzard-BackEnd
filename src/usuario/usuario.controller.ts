@@ -28,7 +28,7 @@ export class UsuarioController {
   }
 
   @Get()
-  @Roles(RolesEnum.Admin, RolesEnum.Emp)
+  @Roles(RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   findAll() {
     return this.usuarioService.findAll();

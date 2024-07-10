@@ -14,7 +14,7 @@ async function bootstrap() {
   const conf = new DocumentBuilder()
     .setTitle('AgroEmprende')
     .setDescription('its a formative project')
-    .setVersion('1.0.0')
+    .setVersion('1.21.0')
     .addTag('project')
     .build();
   const doc = SwaggerModule.createDocument(app, conf);

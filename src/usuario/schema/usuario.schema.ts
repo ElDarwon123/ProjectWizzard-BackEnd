@@ -33,7 +33,6 @@ export class Usuario extends Document {
 
   @Prop({ required: true })
   role: string;
-
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

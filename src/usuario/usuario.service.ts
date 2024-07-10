@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UsuarioService {
   constructor(
-    @InjectModel('Usuario') private readonly usuarioModel: Model<Usuario>,
+    @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
@@ -34,8 +34,7 @@ export class UsuarioService {
   }
 
   async findByEmail(email: string) {
-    const user = await this.usuarioModel
-      .findOne({ email })
+    const user = await this.usuarioModel.findOne({ email });
     return user;
   }
 
@@ -46,10 +45,12 @@ export class UsuarioService {
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
-    const updateUser = (
-      await this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {
+    const updateUser = await this.usuarioModel.findByIdAndUpdate(
+      id,
+      updateUsuarioDto,
+      {
         new: true,
-      })
+      },
     );
     return updateUser;
   }
@@ -58,6 +59,4 @@ export class UsuarioService {
     const delUser = await this.usuarioModel.findByIdAndDelete(id);
     return delUser;
   }
-
-
 }

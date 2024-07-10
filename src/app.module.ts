@@ -8,6 +8,8 @@ import { RoleModule } from './role/role.module';
 import { AuthModule } from './auth/auth.module';
 import { ProyectoModule } from './proyecto/proyecto.module';
 import { FilesModule } from './files/files.module';
+import { SeccionModule } from './seccion/seccion.module';
+import { RevisionModule } from './revision/revision.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     ProyectoModule,
     FilesModule,
+    SeccionModule,
+    RevisionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

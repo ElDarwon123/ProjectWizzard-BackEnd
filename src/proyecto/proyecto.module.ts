@@ -13,5 +13,6 @@ import { Proyecto, ProyectoSchema } from './schema/proyecto.shema';
   imports: [MongooseModule.forFeature([{ name: Proyecto.name, schema: ProyectoSchema }])],
   providers: [ProyectoService],
   controllers: [ProyectoController],
+  exports: [ProyectoService,]
 })
 export class ProyectoModule {}
