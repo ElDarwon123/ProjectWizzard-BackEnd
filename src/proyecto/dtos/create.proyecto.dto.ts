@@ -11,4 +11,7 @@ export class CreateProyectoDto {
 
   @IsEnum(EstadoProyecto)
   estado: EstadoProyecto;
+
+  @IsString()
+  descripcion: string;
 }

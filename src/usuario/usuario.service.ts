@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,6 +12,12 @@ export class UsuarioService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
+    const existingUser = await this.usuarioModel.findOne({
+      email: createUsuarioDto.email,
+    });
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
     const newUser = new this.usuarioModel(createUsuarioDto);
     await newUser.save();
     return newUser;
@@ -34,6 +40,12 @@ export class UsuarioService {
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
+    const existingUser = await this.usuarioModel.findOne({
+      email: updateUsuarioDto.email,
+    });
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
     const updateUser = (
       await this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {
         new: true,
@@ -47,11 +59,5 @@ export class UsuarioService {
     return delUser;
   }
 
-  async validateUser(email: string, pass: string): Promise<Usuario | null> {
-    const user = await this.usuarioModel.findOne({ email });
-    if (user && (await user.comparePassword(pass))) {
-      return user;
-    }
-    return null;
-  }
+
 }

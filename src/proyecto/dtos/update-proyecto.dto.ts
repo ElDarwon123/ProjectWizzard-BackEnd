@@ -1,4 +1,3 @@
-
 import { IsString, IsEnum, IsOptional } from 'class-validator';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 
@@ -14,4 +13,8 @@ export class UpdateProyectoDto {
   @IsOptional()
   @IsEnum(EstadoProyecto)
   estado?: EstadoProyecto;
+
+  @IsOptional()
+  @IsString()
+  descripcion?: string;
 }

@@ -14,6 +14,9 @@ export class Proyecto extends Document {
 
   @Prop({ type: String, enum: EstadoProyecto, default: EstadoProyecto.PENDIENTE })
   estado: EstadoProyecto;
+
+  @Prop({ type: String })
+  descripcion?: string; // El campo descripcion es opcional (?)
 }
 
 export const ProyectoSchema = SchemaFactory.createForClass(Proyecto);
