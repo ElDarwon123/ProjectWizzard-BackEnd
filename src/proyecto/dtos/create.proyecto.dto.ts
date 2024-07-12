@@ -1,17 +1,24 @@
-
-import { IsString, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 
 export class CreateProyectoDto {
   @IsString()
+  @IsNotEmpty()
   titulo: string;
 
   @IsString()
+  @IsNotEmpty()
   fecha: string;
 
   @IsEnum(EstadoProyecto)
-  estado: EstadoProyecto;
+  @IsOptional()
+  estado?: EstadoProyecto;
 
   @IsString()
-  descripcion: string;
+  @IsOptional()
+  descripcion?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  usuarioId: string; // Asegúrate de incluir el usuarioId
 }

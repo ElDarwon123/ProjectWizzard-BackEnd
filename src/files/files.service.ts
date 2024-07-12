@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { File, FileDocument } from './schemas/file.schema';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 @Injectable()
 export class FilesService {
-  constructor(@InjectModel(File.name) private fileModel: Model<FileDocument>) {}
+  constructor(@InjectModel(File.name) private fileModel: Model<FileDocument>) { }
 
   async create(file: Express.MulterFile): Promise<File> {
     const createdFile = new this.fileModel({
@@ -23,5 +25,17 @@ export class FilesService {
 
   async findOne(id: string): Promise<File> {
     return this.fileModel.findById(id).exec();
+  }
+
+  async delete(id: string): Promise<{ message: string }> {
+    const file = await this.findOne(id);
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    await unlink(file.path); // Elimina el archivo del sistema de archivos
+    await this.fileModel.findByIdAndDelete(id); // Elimina el documento de la base de datos
+
+    return { message: 'File deleted successfully' };
   }
 }

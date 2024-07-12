@@ -4,26 +4,21 @@ import { Model } from 'mongoose';
 import { Proyecto } from './schema/proyecto.shema';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
-
 import { UsuarioService } from 'src/usuario/usuario.service';
-
-
 
 @Injectable()
 export class ProyectoService {
   constructor(
     @InjectModel(Proyecto.name) private proyectoModel: Model<Proyecto>,
-
-    private readonly usuarioService : UsuarioService,
-    
-  ) {}
+    private readonly usuarioService: UsuarioService,
+  ) { }
 
   async findAll(): Promise<Proyecto[]> {
-    return this.proyectoModel.find().exec();
+    return this.proyectoModel.find().populate('usuarioId').exec();
   }
 
   async findOne(id: string): Promise<Proyecto> {
-    const proyecto = await this.proyectoModel.findById(id).exec();
+    const proyecto = await this.proyectoModel.findById(id).populate('usuarioId').exec();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
     }
@@ -40,7 +35,6 @@ export class ProyectoService {
     if (!updatedProyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
     }
-   
     return updatedProyecto;
   }
 

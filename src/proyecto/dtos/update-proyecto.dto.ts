@@ -1,20 +1,20 @@
-import { IsString, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 
 export class UpdateProyectoDto {
-  @IsOptional()
   @IsString()
+  @IsOptional()
   titulo?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   fecha?: string;
 
-  @IsOptional()
   @IsEnum(EstadoProyecto)
+  @IsOptional()
   estado?: EstadoProyecto;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   descripcion?: string;
 }

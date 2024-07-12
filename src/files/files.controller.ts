@@ -1,6 +1,9 @@
 import {
   Controller,
   Post,
+  Delete,
+  Get,
+  Param,
   UploadedFile,
   UseInterceptors,
   BadRequestException,
@@ -15,7 +18,7 @@ const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(private readonly filesService: FilesService) { }
 
   @Post('upload')
   @UseInterceptors(
@@ -39,7 +42,16 @@ export class FilesController {
     if (!file) {
       throw new BadRequestException('File is not received');
     }
-    return this.filesService.create(file)
+    return this.filesService.create(file);
+  }
+
+  @Get()
+  async getAllFiles() {
+    return this.filesService.findAll();
+  }
+
+  @Delete(':id')
+  async deleteFile(@Param('id') id: string) {
+    return this.filesService.delete(id);
   }
 }
-
