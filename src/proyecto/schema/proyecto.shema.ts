@@ -1,42 +1,22 @@
+// proyectos/proyecto.schema.ts
+
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 
 @Schema()
 export class Proyecto extends Document {
-  @Prop({ required: true })
-  fase_idFase: number;
-
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   titulo: string;
 
-  @Prop({ required: true })
-  fecha_creacion: string;
+  @Prop({ type: String, required: true })
+  fecha: string;
 
-  @Prop({ required: true })
-  estado_idea: string;
+  @Prop({ type: String, enum: EstadoProyecto, default: EstadoProyecto.PENDIENTE })
+  estado: EstadoProyecto;
 
-  @Prop({ required: true })
-  objetivos_especificos: string;
-
-  @Prop({ required: true })
-  objetivo_general: string;
-
-  @Prop({ required: true })
-  eje_estrategico: string;
-
-  @Prop({ required: true })
-  estado: string;
-
-  @Prop({ required: true })
-  categoria_idCategoria: number;
-
-  @Prop({ required: true })
-  convocatoria_idConvocatoria: number;
-
-  @Prop({ required: true })
-  usuario_id_asignado: number;
-
-  
+  @Prop({ type: String })
+  descripcion?: string; // El campo descripcion es opcional (?)
 }
 
 export const ProyectoSchema = SchemaFactory.createForClass(Proyecto);

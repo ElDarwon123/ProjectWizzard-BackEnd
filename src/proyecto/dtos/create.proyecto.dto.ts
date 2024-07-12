@@ -1,39 +1,17 @@
-import { IsNumber, IsString } from 'class-validator';
+
+import { IsString, IsEnum } from 'class-validator';
+import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 
 export class CreateProyectoDto {
-  @IsNumber()
-  fase_idFase: number;
-
   @IsString()
   titulo: string;
 
   @IsString()
-  fecha_creacion: string;
+  fecha: string;
+
+  @IsEnum(EstadoProyecto)
+  estado: EstadoProyecto;
 
   @IsString()
-  estado_idea: string;
-
-  @IsString()
-  objetivos_especificos: string;
-
-  @IsString()
-  objetivo_general: string;
-
-  @IsString()
-  eje_estrategico: string;
-
-
-  
-
-  @IsString()
-  estado: string;
-
-  @IsNumber()
-  categoria_idCategoria: number;
-
-  @IsNumber()
-  convocatoria_idConvocatoria: number;
-
-  @IsNumber()
-  usuario_id_asignado: number;
+  descripcion: string;
 }
