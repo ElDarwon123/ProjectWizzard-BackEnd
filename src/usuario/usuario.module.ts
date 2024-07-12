@@ -1,15 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { UsuarioController } from './usuario.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { usuarioSchema } from './schema/usuario.schema';
-import { SeccionModule } from 'src/seccion/seccion.module';
+import { SharedModule } from 'src/shared.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: 'Usuario', schema: usuarioSchema }]),
-    SeccionModule,
-  ],
+  imports: [SharedModule],
   controllers: [UsuarioController],
   providers: [UsuarioService],
   exports: [UsuarioService],

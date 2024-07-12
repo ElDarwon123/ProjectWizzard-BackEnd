@@ -27,7 +27,7 @@ export class CreateUsuarioDto {
   telefono: string;
   @IsDateString()
   @IsOptional()
-  fechaNacimiento?: Date;
+  fechaNacimiento: Date;
   @IsString()
   caracterizacion: string;
   @IsString()
