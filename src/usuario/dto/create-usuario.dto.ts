@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsDateString, IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 import { RolesEnum } from 'src/enums/role.enum';
 
@@ -25,6 +25,9 @@ export class CreateUsuarioDto {
   numIdentificacion: string;
   @IsString()
   telefono: string;
+  @IsDateString()
+  @IsOptional()
+  fechaNacimiento?: Date;
   @IsString()
   caracterizacion: string;
   @IsString()

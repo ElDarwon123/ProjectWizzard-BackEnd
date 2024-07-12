@@ -15,7 +15,9 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesEnum } from 'src/enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Seccion')
 @Controller('seccion')
 export class SeccionController {
   constructor(private readonly seccionService: SeccionService) {}
