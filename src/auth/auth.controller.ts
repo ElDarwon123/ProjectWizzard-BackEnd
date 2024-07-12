@@ -13,10 +13,12 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 // autenticatio
+@ApiTags('Autorizaciones, Iniciar Sesión y Ver Perfil')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -26,11 +28,10 @@ export class AuthController {
       createAuthDto.contrasena,
     );
   }
-  // profile 
+  // profile
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
   }
-
 }

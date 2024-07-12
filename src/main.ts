@@ -13,9 +13,8 @@ async function bootstrap() {
   });
   const conf = new DocumentBuilder()
     .setTitle('AgroEmprende')
-    .setDescription('its a formative project')
-    .setVersion('1.0.0')
-    .addTag('project')
+    .setDescription("it's a formative project")
+    .setVersion('2.0.0')
     .build();
   const doc = SwaggerModule.createDocument(app, conf);
   SwaggerModule.setup('api', app, doc);

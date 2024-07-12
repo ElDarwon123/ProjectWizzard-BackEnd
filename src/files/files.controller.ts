@@ -13,9 +13,11 @@ import { FilesService } from './files.service';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
+import { ApiTags } from '@nestjs/swagger';
 
 const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 
+@ApiTags('Archivo')
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) { }
