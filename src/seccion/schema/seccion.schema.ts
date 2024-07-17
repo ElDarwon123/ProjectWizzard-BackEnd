@@ -4,6 +4,12 @@ import * as mongoose from 'mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
+export class TipoSeccion {
+  @ApiProperty()
+  nombre: string;
+  @ApiProperty()
+  contenido: string;
+}
 @Schema()
 export class Seccion extends Document {
   @ApiProperty()
@@ -12,7 +18,7 @@ export class Seccion extends Document {
 
   @ApiProperty()
   @Prop({ required: true })
-  tipoSeccion: String;
+  tipoSeccion: TipoSeccion;
 
   @ApiProperty()
   @Prop({ default: Date.now })

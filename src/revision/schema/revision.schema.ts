@@ -1,6 +1,7 @@
 import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { Document } from 'mongoose';
+import { EstadoRevision } from 'src/enums/estado.revision.enum';
 import { Seccion } from 'src/seccion/schema/seccion.schema';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
 
@@ -14,7 +15,7 @@ export class Revision extends Document {
   seccion: Seccion;
   @ApiProperty()
   @Prop()
-  estado: String;
+  estado: EstadoRevision;
   @ApiProperty()
   @Prop({ type: String, required: true })
   sugerencia: String;
@@ -23,7 +24,7 @@ export class Revision extends Document {
   descripcion: String;
   @ApiProperty()
   @Prop({ default: Date.now })
-  fechaRevision: String;
+  fechaRevision: Date;
 }
 
 export const revisionSchema = SchemaFactory.createForClass(Revision);

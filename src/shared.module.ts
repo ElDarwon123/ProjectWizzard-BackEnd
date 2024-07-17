@@ -10,6 +10,8 @@ import { Revision, revisionSchema } from './revision/schema/revision.schema';
 import { File, FileSchema } from './files/schemas/file.schema';
 import { RevisionService } from './revision/revision.service';
 import { FilesService } from './files/files.service';
+import { BlackList, BlackListSchema } from './auth/schema/auth.entity';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { FilesService } from './files/files.service';
       { name: Seccion.name, schema: seccionSchema },
       { name: Revision.name, schema: revisionSchema },
       { name: File.name, schema: FileSchema },
+      { name: BlackList.name, schema: BlackListSchema },
     ]),
   ],
   providers: [
@@ -27,6 +30,7 @@ import { FilesService } from './files/files.service';
     SeccionService,
     RevisionService,
     FilesService,
+    AuthService,
   ],
   exports: [
     ProyectoService,
@@ -35,6 +39,7 @@ import { FilesService } from './files/files.service';
     RevisionService,
     FilesService,
     MongooseModule,
+    AuthService,
   ],
 })
 export class SharedModule {}

@@ -1,10 +1,12 @@
-import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsObject, IsString } from 'class-validator';
+import mongoose, { ObjectId } from 'mongoose';
+import { TipoSeccion } from '../schema/seccion.schema';
 
 export class CreateSeccionDto {
   @IsMongoId()
   @IsNotEmpty()
-  proyecto: string;
-  @IsString()
+  proyecto: ObjectId;
+  @IsObject()
   @IsNotEmpty()
-  tipoSeccion: string;
+  tipoSeccion: TipoSeccion;
 }

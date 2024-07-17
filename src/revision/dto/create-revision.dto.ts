@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
@@ -6,15 +7,15 @@ import {
   MinLength,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import { EstadoRevision } from 'src/enums/estado.revision.enum';
 
 export class CreateRevisionDto {
   @IsMongoId()
   usuario: Types.ObjectId;
   @IsMongoId()
   seccion: Types.ObjectId;
-  @IsString()
-  @IsOptional()
-  estado: string;
+  @IsEnum(EstadoRevision)
+  estado: EstadoRevision;
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
