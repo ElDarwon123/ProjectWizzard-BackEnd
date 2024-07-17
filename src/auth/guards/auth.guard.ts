@@ -2,7 +2,9 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
@@ -36,17 +38,21 @@ export class AuthGuard implements CanActivate {
       if (err instanceof JsonWebTokenError) {
         throw new UnauthorizedException('Invalid token signature');
       }
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid token signature');
     }
     return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const authHeader = request.headers.authorization;
-    if (!authHeader) {
-      return undefined;
-    }
-    const [type, token] = authHeader.split(' ');
-    return type === 'Bearer' ? token : undefined;
+    try {
+      const authHeader = request.headers.authorization;
+      if (!authHeader) {
+        throw new NotFoundException('Token header not found');
+      }
+      const [type, token] = authHeader.split(' ');
+      return type === 'Bearer' ? token : undefined;
+    } catch (error) {
+      throw new ForbiddenException()
+    };
   }
 }

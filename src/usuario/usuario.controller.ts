@@ -23,7 +23,7 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('auth/usuario')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
-  
+
   @Post()
   create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuarioService.create(createUsuarioDto);

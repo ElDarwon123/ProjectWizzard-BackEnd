@@ -1,8 +1,9 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import {  Document, Schema as MongooseSchema } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { RolesEnum } from 'src/enums/role.enum';
 @Schema()
 export class Usuario extends Document {
   @ApiProperty()
@@ -26,8 +27,11 @@ export class Usuario extends Document {
   telefono: string;
 
   @ApiProperty()
-  @Prop({ type: Date })
-  fechaNacimieto: Date;
+  @Prop({
+    required: true,
+    set: (value: string) => new Date(value)
+   })
+  fechaNacimiento: Date;
 
   @ApiProperty()
   @Prop()
@@ -40,8 +44,8 @@ export class Usuario extends Document {
   contrasena: string;
 
   @ApiProperty()
-  @Prop({ required: true })
-  role: string;
+  @Prop({ required: true, enum: RolesEnum })
+  role: RolesEnum;
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);
