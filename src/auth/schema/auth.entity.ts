@@ -1,3 +1,4 @@
+import { Prop } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { Document, Schema } from "mongoose";
 
@@ -11,7 +12,9 @@ export const BlackListSchema = new Schema({
 
 export class BlackList extends Document{
     @ApiProperty()
+    @Prop({ required: true })
     token: string;
     @ApiProperty()
+    @Prop({ default: Date.now })
     createdAt: Date;
 }

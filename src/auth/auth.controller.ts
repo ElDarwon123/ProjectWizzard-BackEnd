@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { Request as Requ } from 'express';
+import { Request as Requ, Response as Res } from 'express';
 // autenticatio
 @ApiTags('Autorizaciones, Iniciar Sesión y Ver Perfil')
 @Controller('auth')
@@ -41,8 +41,9 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   @Post('logout')
-  async logOut(@Request() req: Requ, @Response() res: Requ) {
+  async logOut(@Request() req: Requ, @Response() res: Res) {
     const token = req.headers.authorization.split(' ')[1];
-    await this.authService.logOut(token);
+    await this.authService.logOut({ token });
+    res.status(HttpStatus.OK).json({ message: "Logout successful" })
   }
 }

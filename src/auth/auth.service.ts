@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { BlackList } from './schema/auth.entity';
 import { Model } from 'mongoose';
+import { CreateBlackList } from './dto/create-blackList.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,8 +44,10 @@ export class AuthService {
     }
   }
 
-  async logOut(token: string) {
-    await this.blackList.create({ token });
+  async logOut(token: CreateBlackList) {
+    const tokenInBl = new this.blackList(token)
+    await tokenInBl.save();
+    return tokenInBl
   }
 
   async validateToken(token: string): Promise<boolean> {
