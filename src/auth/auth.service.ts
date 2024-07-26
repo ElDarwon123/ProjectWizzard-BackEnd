@@ -13,6 +13,7 @@ import { Model } from 'mongoose';
 import { CreateBlackList } from './dto/create-blackList.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
+import { Usuario } from 'src/usuario/schema/usuario.schema';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailerService: MailerService,
     @InjectModel(BlackList.name) private readonly blackList: Model<BlackList>,
+    @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
   ) {}
 
   async singIn(email: string, pass: string): Promise<{ access_token: string }> {
@@ -101,16 +103,14 @@ export class AuthService {
       const decoded = await this.jwtService.verifyAsync(token);
       email = decoded.email;
       id = decoded.id;
+      const user = this.userService.findByEmail(email);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const newPP = this.usuarioModel.findByIdAndUpdate(id, newPassword)
+      return newPP;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
     }
-
-    const user = this.userService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const newPP = this.userService.update(id, newPassword);
-    return newPP;
   }
 }

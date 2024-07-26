@@ -29,6 +29,9 @@ export class AuthGuard implements CanActivate {
       const payLoad = this.jwtService.verifyAsync(token, {
         secret: jwtConstants,
       });
+      if (payLoad instanceof TokenExpiredError) {
+        throw new UnauthorizedException('Invalid token expired');
+      }
       const isBlacklisted = await this.authService.validateToken(token);
       if (!isBlacklisted) {
         throw new UnauthorizedException('Token ha sido invalidado');

@@ -11,6 +11,7 @@ import {
   UseGuards,
   Response,
   Patch,
+  Param,
 } from '@nestjs/common';
 //import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
@@ -56,10 +57,10 @@ export class AuthController {
     res.status(HttpStatus.OK).json(await this.authService.sendPassWordResetEmail(user.email));
   }
 
-  @Patch('reset-password')
+  @Patch('reset-password/:token')
   async resetPassword(
-    @Body('token') token: string,
-    @Body('newPassword') newPassword: UpdateUsuarioDto,
+    @Param('token') token: string,
+    @Body() newPassword: UpdateUsuarioDto,
   ) {
     return await this.authService.resetPassword(token, newPassword);
   }
