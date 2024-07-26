@@ -11,7 +11,6 @@ import { SharedModule } from 'src/shared.module';
     JwtModule.register({
       global: true,
       secret: jwtConstants,
-      signOptions: { expiresIn: '5h' },
     }),
     UsuarioModule,
     SharedModule
