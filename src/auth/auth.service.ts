@@ -12,7 +12,7 @@ import { BlackList } from './schema/auth.entity';
 import { Model } from 'mongoose';
 import { CreateBlackList } from './dto/create-blackList.dto';
 import { MailerService } from '@nestjs-modules/mailer';
-
+import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
 
 @Injectable()
 export class AuthService {
@@ -61,18 +61,19 @@ export class AuthService {
     return true;
   }
 
-  async sendPassWordResetEmail(email: string): Promise<void> {
+  async sendPassWordResetEmail(email: string): Promise<{ pass_token: string }> {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    console.log(user);
 
     const token = await this.jwtService.sign(
-      { email: user.email },
+      { email: user.email, id: user._id },
       { expiresIn: '1h' },
     );
 
-    const resetUrl = `http://your-frontend-domain.com/reset-password?token=${token}`;
+    const resetUrl = `http://localhost:5173/reset-password?token=${token}`;
 
     try {
       await this.mailerService.sendMail({
@@ -85,17 +86,21 @@ export class AuthService {
           token: token,
         },
       });
+      return {
+        pass_token: token,
+      };
     } catch (error) {
       console.error(error);
-      
     }
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<void> {
+  async resetPassword(token: string, newPassword: UpdateUsuarioDto) {
     let email: string;
+    let id: string;
     try {
       const decoded = await this.jwtService.verifyAsync(token);
       email = decoded.email;
+      id = decoded.id;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
     }
@@ -105,7 +110,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    (await user).contrasena = await bcrypt.hash(newPassword, 10);
-    (await user).save();
+    const newPP = this.userService.update(id, newPassword);
+    return newPP;
   }
 }

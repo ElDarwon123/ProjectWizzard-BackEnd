@@ -18,6 +18,9 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { Request as Requ, Response as Res } from 'express';
+import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
+import { CreateUsuarioDto } from 'src/usuario/dto/create-usuario.dto';
+import { sendEmail } from './dto/send-email.dto';
 // autenticatio
 @ApiTags('Autorizaciones, Iniciar Sesión y Ver Perfil')
 @Controller('auth')
@@ -49,18 +52,15 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body('email') email: string, @Response() res: Res) {
-    await this.authService.sendPassWordResetEmail(email);
-    res.status(HttpStatus.OK).json({ message: 'Password reset email sent' });
+  async forgotPassword(@Body() user: sendEmail, @Response() res: Res) {
+    res.status(HttpStatus.OK).json(await this.authService.sendPassWordResetEmail(user.email));
   }
 
   @Patch('reset-password')
   async resetPassword(
     @Body('token') token: string,
-    @Body('newPassword') newPassword: string,
-    @Response() res: Res
+    @Body('newPassword') newPassword: UpdateUsuarioDto,
   ) {
-    await this.authService.resetPassword(token, newPassword);
-    res.status(HttpStatus.OK).json({ message: 'Password reseted successfully ' })
+    return await this.authService.resetPassword(token, newPassword);
   }
 }

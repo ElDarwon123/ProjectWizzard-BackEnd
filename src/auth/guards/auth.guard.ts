@@ -7,7 +7,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { jwtConstants } from '../constants';
 import { Request } from 'express';
 import { AuthService } from '../auth.service';
@@ -34,13 +34,13 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Token ha sido invalidado');
       }
       request['user'] = payLoad;
+      return true;
     } catch (err) {
-      if (err instanceof JsonWebTokenError) {
-        throw new UnauthorizedException('Invalid token signature');
+      if (err instanceof TokenExpiredError) {
+        throw new UnauthorizedException('Invalid token expired');
       }
       throw new UnauthorizedException('Invalid token signature');
     }
-    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
@@ -52,7 +52,10 @@ export class AuthGuard implements CanActivate {
       const [type, token] = authHeader.split(' ');
       return type === 'Bearer' ? token : undefined;
     } catch (error) {
-      throw new ForbiddenException()
-    };
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException('Invalid token expired');
+      }
+      throw new UnauthorizedException('Invalid token signature');
+    }
   }
 }
