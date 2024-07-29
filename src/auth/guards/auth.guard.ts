@@ -40,9 +40,9 @@ export class AuthGuard implements CanActivate {
       return true;
     } catch (err) {
       if (err instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Invalid token expired');
+        throw new TokenExpiredError("Token Expired", new Date());
       }
-      throw new UnauthorizedException('Invalid token signature');
+      throw new JsonWebTokenError(err);
     }
   }
 
@@ -56,9 +56,9 @@ export class AuthGuard implements CanActivate {
       return type === 'Bearer' ? token : undefined;
     } catch (error) {
       if (error instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Invalid token expired');
+        throw new TokenExpiredError('Token Expired', new Date());
       }
-      throw new UnauthorizedException('Invalid token signature');
+      throw new JsonWebTokenError(error);
     }
   }
 }

@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -92,7 +92,10 @@ export class AuthService {
         pass_token: token,
       };
     } catch (error) {
-      console.error(error);
+      if (error instanceof TokenExpiredError) {
+        throw new TokenExpiredError('Token Expired', new Date());
+      }
+      throw new JsonWebTokenError(error);
     }
   }
 
