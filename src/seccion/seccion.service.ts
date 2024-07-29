@@ -4,17 +4,33 @@ import { UpdateSeccionDto } from './dto/update-seccion.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Seccion } from './schema/seccion.schema';
 import { Model } from 'mongoose';
+import { ProyectoService } from 'src/proyecto/proyecto.service';
 
 @Injectable()
 export class SeccionService {
   constructor(
     @InjectModel(Seccion.name) private readonly seccionModel: Model<Seccion>,
+    private readonly projectService: ProyectoService,
   ) {}
+  // async create(createProyectoDto: CreateProyectoDto): Promise<Proyecto> {
+  //   const createdProyecto = new this.proyectoModel(createProyectoDto);
+  //   const proyecto = await createdProyecto.save();
 
+  //   await this.usuarioService.addProyectoToUser(
+  //     createProyectoDto.usuarioId,
+  //     proyecto.id,
+  //   );
+  //   return proyecto;
+  // }
   async create(createSeccionDto: CreateSeccionDto) {
     const newSec = new this.seccionModel(createSeccionDto);
-    await newSec.save();
-    return newSec.populate('proyecto');
+    const secc = await newSec.save();
+
+    await this.projectService.addSeccionToProject(
+      createSeccionDto.proyecto,
+      secc.id,
+    );
+    return secc.populate('proyecto');
   }
 
   async findAll(): Promise<Seccion[]> {

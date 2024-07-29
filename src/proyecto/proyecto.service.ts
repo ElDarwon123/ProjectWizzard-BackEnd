@@ -11,14 +11,22 @@ export class ProyectoService {
   constructor(
     @InjectModel(Proyecto.name) private proyectoModel: Model<Proyecto>,
     private readonly usuarioService: UsuarioService,
-  ) { }
+  ) {}
 
   async findAll(): Promise<Proyecto[]> {
-    return this.proyectoModel.find().populate('usuarioId').exec();
+    return this.proyectoModel
+      .find()
+      .populate('usuarioId')
+      .populate('secciones')
+      .exec();
   }
 
   async findOne(id: string): Promise<Proyecto> {
-    const proyecto = await this.proyectoModel.findById(id).populate('usuarioId').exec();
+    const proyecto = await this.proyectoModel
+      .findById(id)
+      .populate('usuarioId')
+      .populate('secciones')
+      .exec();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
     }
@@ -29,12 +37,34 @@ export class ProyectoService {
     const createdProyecto = new this.proyectoModel(createProyectoDto);
     const proyecto = await createdProyecto.save();
 
-    await this.usuarioService.addProyectoToUser(createProyectoDto.usuarioId, proyecto.id);
+    await this.usuarioService.addProyectoToUser(
+      createProyectoDto.usuarioId,
+      proyecto.id,
+    );
     return proyecto;
   }
 
-  async update(id: string, updateProyectoDto: UpdateProyectoDto): Promise<Proyecto> {
-    const updatedProyecto = await this.proyectoModel.findByIdAndUpdate(id, updateProyectoDto, { new: true }).exec();
+  async addSeccionToProject(
+    projectId: string,
+    seccionId: string,
+  ): Promise<Proyecto> {
+    const proj = await this.proyectoModel.findById(projectId);
+    if (!proj) {
+      throw new NotFoundException('Project not found');
+    }
+
+    proj.secciones.push(seccionId);
+    await proj.save();
+    return proj;
+  }
+
+  async update(
+    id: string,
+    updateProyectoDto: UpdateProyectoDto,
+  ): Promise<Proyecto> {
+    const updatedProyecto = await this.proyectoModel
+      .findByIdAndUpdate(id, updateProyectoDto, { new: true })
+      .exec();
     if (!updatedProyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
     }
@@ -42,7 +72,9 @@ export class ProyectoService {
   }
 
   async remove(id: string): Promise<Proyecto> {
-    const deletedProyecto = await this.proyectoModel.findByIdAndDelete(id).exec();
+    const deletedProyecto = await this.proyectoModel
+      .findByIdAndDelete(id)
+      .exec();
     if (!deletedProyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
     }

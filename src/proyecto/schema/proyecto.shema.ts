@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import mongoose, { Document, Schema as MongooseSchema, ObjectId } from 'mongoose';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -23,10 +23,15 @@ export class Proyecto extends Document {
 
   @ApiProperty()
   @Prop({ type: String })
-  descripcion?: string; // El campo descripcion es opcional (?)
+  descripcion?: string; 
 
+  @ApiProperty()
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Usuario', required: true })
-  usuarioId: string; // Agrega una referencia al usuario
+  usuarioId: string; 
+
+  @ApiProperty()
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Seccion', required: true })
+  secciones: string[];
 }
 
 export const ProyectoSchema = SchemaFactory.createForClass(Proyecto);
