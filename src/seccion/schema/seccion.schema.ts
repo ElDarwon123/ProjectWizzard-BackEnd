@@ -18,7 +18,7 @@ export class Seccion extends Document {
 
   @ApiProperty()
   @Prop({ required: true })
-  tipoSeccion: TipoSeccion;
+  tipoSeccion: TipoSeccion[];
 
   @ApiProperty()
   @Prop({ default: Date.now })

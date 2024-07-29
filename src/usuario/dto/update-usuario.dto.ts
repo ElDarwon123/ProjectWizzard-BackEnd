@@ -12,28 +12,31 @@ import { RolesEnum } from 'src/enums/role.enum';
 
 export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @IsString()
-  @IsNotEmpty()
-  nombre: string;
+  @IsOptional()
+  nombre?: string;
   @IsString()
-  @IsNotEmpty()
-  apellido: string;
+  @IsOptional()
+  apellido?: string;
   @IsString()
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
   @IsString()
-  @IsNotEmpty()
-  numIdentificacion: string;
+  @IsOptional()
+  numIdentificacion?: string;
   @IsString()
-  telefono: string;
+  @IsOptional()
+  telefono?: string;
   @IsDateString()
   @IsOptional()
   fechaNacimiento?: Date;
   @IsString()
-  caracterizacion: string;
+  @IsOptional()
+  caracterizacion?: string;
   @IsString()
-  @IsNotEmpty()
-  contrasena: string;
-  @IsNotEmpty()
+  @IsOptional()
+  contrasena?: string;
+  @IsOptional()
   @IsEnum(RolesEnum)
-  role: string;
+  role?: string;
 }

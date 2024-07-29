@@ -8,5 +8,5 @@ export class CreateSeccionDto {
   proyecto: ObjectId;
   @IsObject()
   @IsNotEmpty()
-  tipoSeccion: TipoSeccion;
+  tipoSeccion: TipoSeccion[];
 }
