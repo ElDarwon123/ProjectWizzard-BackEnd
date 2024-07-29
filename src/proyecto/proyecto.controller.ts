@@ -1,5 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, UseGuards } 
-from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UsePipes,
+  ValidationPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ProyectoService } from './proyecto.service';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
@@ -9,11 +19,15 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { RolesEnum } from 'src/enums/role.enum';
 import { ApiTags } from '@nestjs/swagger';
+import { UsuarioService } from 'src/usuario/usuario.service';
 
 @ApiTags('Proyecto')
 @Controller('proyectos')
 export class ProyectoController {
-  constructor(private readonly proyectoService: ProyectoService) {}
+  constructor(
+    private readonly proyectoService: ProyectoService,
+    private readonly usuarioService: UsuarioService,
+  ) {}
 
   @Post()
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)

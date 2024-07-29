@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsMongoId } from 'class-validator';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 
 export class CreateProyectoDto {
@@ -6,7 +6,7 @@ export class CreateProyectoDto {
   @IsNotEmpty()
   titulo: string;
 
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   fecha: string;
 
@@ -18,7 +18,7 @@ export class CreateProyectoDto {
   @IsOptional()
   descripcion?: string;
 
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
   usuarioId: string; // Asegúrate de incluir el usuarioId
 }

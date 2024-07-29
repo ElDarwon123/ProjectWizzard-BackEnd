@@ -9,6 +9,7 @@ import {
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUsuarioDto } from './create-usuario.dto';
 import { RolesEnum } from 'src/enums/role.enum';
+import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
 
 export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @IsString()
@@ -39,4 +40,6 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @IsOptional()
   @IsEnum(RolesEnum)
   role?: string;
+  @IsOptional()
+  proyectos: Proyecto;
 }

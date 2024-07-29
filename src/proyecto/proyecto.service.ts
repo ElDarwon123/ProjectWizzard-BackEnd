@@ -27,7 +27,10 @@ export class ProyectoService {
 
   async create(createProyectoDto: CreateProyectoDto): Promise<Proyecto> {
     const createdProyecto = new this.proyectoModel(createProyectoDto);
-    return createdProyecto.save();
+    const proyecto = await createdProyecto.save();
+
+    await this.usuarioService.addProyectoToUser(createProyectoDto.usuarioId, proyecto.id);
+    return proyecto;
   }
 
   async update(id: string, updateProyectoDto: UpdateProyectoDto): Promise<Proyecto> {

@@ -1,9 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Usuario } from './schema/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Usuario } from './schema/usuario.schema';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class UsuarioService {
@@ -23,19 +27,31 @@ export class UsuarioService {
     return newUser;
   }
 
+  async addProyectoToUser(
+    userId: string,
+    proyectoId: string,
+  ): Promise<Usuario> {
+    const user = await this.usuarioModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.proyectos.push(proyectoId);
+    await user.save();
+
+    return user;
+  }
+
   async findAll(): Promise<Usuario[]> {
-    const usuarios = await this.usuarioModel.find();
-    return usuarios;
+    return this.usuarioModel.find().populate('proyectos').exec();
   }
 
   async findOne(id: string) {
-    const user = await this.usuarioModel.findById(id);
-    return user;
+    return this.usuarioModel.findById(id).populate('proyectos').exec();
   }
 
   async findByEmail(email: string) {
-    const user = await this.usuarioModel.findOne({ email });
-    return user;
+    return this.usuarioModel.findOne({ email }).populate('proyectos').exec();
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
@@ -45,18 +61,12 @@ export class UsuarioService {
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
-    const updateUser = await this.usuarioModel.findByIdAndUpdate(
-      id,
-      updateUsuarioDto,
-      {
-        new: true,
-      },
-    );
-    return updateUser;
+    return this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {
+      new: true,
+    });
   }
 
   async remove(id: string) {
-    const delUser = await this.usuarioModel.findByIdAndDelete(id);
-    return delUser;
+    return this.usuarioModel.findByIdAndDelete(id);
   }
 }
