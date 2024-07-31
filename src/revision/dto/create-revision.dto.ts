@@ -6,7 +6,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Types } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 import { EstadoRevision } from 'src/enums/estado.revision.enum';
 
 export class CreateRevisionDto {
@@ -24,4 +24,7 @@ export class CreateRevisionDto {
   @IsNotEmpty()
   @MinLength(6)
   descripcion: string;
+  @IsMongoId()
+  @IsNotEmpty()
+  proyecto: ObjectId;
 }

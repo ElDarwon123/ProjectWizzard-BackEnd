@@ -1,8 +1,3 @@
-// import { Module } from '@nestjs/common';
-
-// @Module({})
-// export class ProyectoModule {}
-
 import { Module } from '@nestjs/common';
 import { ProyectoService } from './proyecto.service';
 import { ProyectoController } from './proyecto.controller';

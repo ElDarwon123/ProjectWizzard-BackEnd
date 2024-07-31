@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, ObjectId } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { ApiProperty } from '@nestjs/swagger';
@@ -51,7 +51,7 @@ export class Usuario extends Document {
 
   @ApiProperty()
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Proyecto' })
-  proyectos: string[];
+  proyectos: ObjectId[];
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

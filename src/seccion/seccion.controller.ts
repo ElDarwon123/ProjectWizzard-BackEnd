@@ -28,24 +28,28 @@ export class SeccionController {
   create(@Body() createSeccionDto: CreateSeccionDto) {
     return this.seccionService.create(createSeccionDto);
   }
+
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get()
   findAll() {
     return this.seccionService.findAll();
   }
+
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.seccionService.findOne(id);
   }
+
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSeccionDto: UpdateSeccionDto) {
     return this.seccionService.update(id, updateSeccionDto);
   }
+
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Delete(':id')

@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsMongoId } from 'class-validator';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
+import { ObjectId } from 'mongoose';
 
 export class CreateProyectoDto {
   @IsString()
@@ -20,5 +21,5 @@ export class CreateProyectoDto {
 
   @IsMongoId()
   @IsNotEmpty()
-  usuarioId: string; // Asegúrate de incluir el usuarioId
+  usuarioId: ObjectId;
 }

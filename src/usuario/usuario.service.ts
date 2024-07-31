@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { Usuario } from './schema/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -28,8 +28,8 @@ export class UsuarioService {
   }
 
   async addProyectoToUser(
-    userId: string,
-    proyectoId: string,
+    userId: ObjectId,
+    proyectoId: ObjectId,
   ): Promise<Usuario> {
     const user = await this.usuarioModel.findById(userId);
     if (!user) {

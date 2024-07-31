@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Proyecto } from './schema/proyecto.shema';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
@@ -16,16 +16,14 @@ export class ProyectoService {
   async findAll(): Promise<Proyecto[]> {
     return this.proyectoModel
       .find()
-      .populate('usuarioId')
-      .populate('secciones')
+      .populate(['usuarioId', 'secciones', 'revisiones'])
       .exec();
   }
 
   async findOne(id: string): Promise<Proyecto> {
     const proyecto = await this.proyectoModel
       .findById(id)
-      .populate('usuarioId')
-      .populate('secciones')
+      .populate(['usuarioId', 'secciones', 'revisiones'])
       .exec();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
@@ -45,8 +43,8 @@ export class ProyectoService {
   }
 
   async addSeccionToProject(
-    projectId: string,
-    seccionId: string,
+    projectId: ObjectId,
+    seccionId: ObjectId,
   ): Promise<Proyecto> {
     const proj = await this.proyectoModel.findById(projectId);
     if (!proj) {
@@ -54,6 +52,19 @@ export class ProyectoService {
     }
 
     proj.secciones.push(seccionId);
+    await proj.save();
+    return proj;
+  }
+
+  async addRevisionToProject(
+    projectId: ObjectId,
+    revisionId: ObjectId,
+  ): Promise<Proyecto> {
+    const proj = await this.proyectoModel.findById(projectId);
+    if (!proj) {
+      throw new NotFoundException('Project not found');
+    }
+    proj.revisiones.push(revisionId);
     await proj.save();
     return proj;
   }

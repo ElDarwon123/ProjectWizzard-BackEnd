@@ -5,7 +5,7 @@ import { TipoSeccion } from '../schema/seccion.schema';
 export class CreateSeccionDto {
   @IsMongoId()
   @IsNotEmpty()
-  proyecto: string;
+  proyecto: ObjectId;
   @IsArray()
   @IsNotEmpty()
   tipoSeccion: TipoSeccion[];

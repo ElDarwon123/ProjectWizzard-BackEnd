@@ -12,16 +12,7 @@ export class SeccionService {
     @InjectModel(Seccion.name) private readonly seccionModel: Model<Seccion>,
     private readonly projectService: ProyectoService,
   ) {}
-  // async create(createProyectoDto: CreateProyectoDto): Promise<Proyecto> {
-  //   const createdProyecto = new this.proyectoModel(createProyectoDto);
-  //   const proyecto = await createdProyecto.save();
 
-  //   await this.usuarioService.addProyectoToUser(
-  //     createProyectoDto.usuarioId,
-  //     proyecto.id,
-  //   );
-  //   return proyecto;
-  // }
   async create(createSeccionDto: CreateSeccionDto) {
     const newSec = new this.seccionModel(createSeccionDto);
     const secc = await newSec.save();
