@@ -4,17 +4,21 @@ import { UpdateConvocatoriaDto } from './dto/update-convocatoria.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Convocatoria } from './schema/convocatoria.entity';
 import { Model, ObjectId } from 'mongoose';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class ConvocatoriaService {
   constructor(
     @InjectModel(Convocatoria.name)
     private readonly convocatoriaModel: Model<Convocatoria>,
+    private readonly firebaseServic: FirebaseService,
   ) {}
 
   async create(createConvocatoriaDto: CreateConvocatoriaDto) {
     const newCon = new this.convocatoriaModel(createConvocatoriaDto);
     await newCon.save();
+
+    
     return newCon;
   }
 

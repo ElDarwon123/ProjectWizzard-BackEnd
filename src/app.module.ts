@@ -14,6 +14,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { strict } from 'assert';
 import { join } from 'path';
 import { ConvocatoriaModule } from './convocatoria/convocatoria.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ConvocatoriaModule } from './convocatoria/convocatoria.module';
     SeccionModule,
     RevisionModule,
     ConvocatoriaModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

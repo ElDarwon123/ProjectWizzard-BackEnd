@@ -14,6 +14,7 @@ import { BlackList, BlackListSchema } from './auth/schema/auth.entity';
 import { AuthService } from './auth/auth.service';
 import { Convocatoria, convocatoriaSchema } from './convocatoria/schema/convocatoria.entity';
 import { ConvocatoriaService } from './convocatoria/convocatoria.service';
+import { FirebaseService } from './firebase/firebase.service';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { ConvocatoriaService } from './convocatoria/convocatoria.service';
     RevisionService,
     FilesService,
     AuthService,
-    ConvocatoriaService
+    ConvocatoriaService,
+    FirebaseService,
   ],
   exports: [
     ProyectoService,
@@ -45,6 +47,7 @@ import { ConvocatoriaService } from './convocatoria/convocatoria.service';
     MongooseModule,
     AuthService,
     ConvocatoriaService,
+    FirebaseService,
   ],
 })
 export class SharedModule {}

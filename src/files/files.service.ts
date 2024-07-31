@@ -12,7 +12,7 @@ export class FilesService {
   async create(file: Express.MulterFile): Promise<File> {
     const createdFile = new this.fileModel({
       filename: file.originalname,
-      path: file.path,
+      path: "http://localhost:4000"+file.path,
       mimetype: file.mimetype,
       size: file.size,
     });
