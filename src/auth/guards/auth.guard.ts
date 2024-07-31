@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import {
   CanActivate,
+  ConflictException,
   ExecutionContext,
   ForbiddenException,
   Injectable,
@@ -58,7 +59,7 @@ export class AuthGuard implements CanActivate {
       if (error instanceof TokenExpiredError) {
         throw new TokenExpiredError('Token Expired', new Date());
       }
-      throw new JsonWebTokenError(error);
+      throw new ConflictException(error);
     }
   }
 }

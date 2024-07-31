@@ -14,7 +14,10 @@ export class Revision extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Seccion' })
   seccion: Seccion[];
   @ApiProperty()
-  @Prop()
+  @Prop({
+    required: true,
+    enum: EstadoRevision
+  })
   estado: EstadoRevision;
   @ApiProperty()
   @Prop({ type: String, required: true })

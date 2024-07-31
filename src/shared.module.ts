@@ -12,6 +12,8 @@ import { RevisionService } from './revision/revision.service';
 import { FilesService } from './files/files.service';
 import { BlackList, BlackListSchema } from './auth/schema/auth.entity';
 import { AuthService } from './auth/auth.service';
+import { Convocatoria, convocatoriaSchema } from './convocatoria/schema/convocatoria.entity';
+import { ConvocatoriaService } from './convocatoria/convocatoria.service';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { AuthService } from './auth/auth.service';
       { name: Revision.name, schema: revisionSchema },
       { name: File.name, schema: FileSchema },
       { name: BlackList.name, schema: BlackListSchema },
+      { name: Convocatoria.name, schema: convocatoriaSchema },
     ]),
   ],
   providers: [
@@ -31,6 +34,7 @@ import { AuthService } from './auth/auth.service';
     RevisionService,
     FilesService,
     AuthService,
+    ConvocatoriaService
   ],
   exports: [
     ProyectoService,
@@ -40,6 +44,7 @@ import { AuthService } from './auth/auth.service';
     FilesService,
     MongooseModule,
     AuthService,
+    ConvocatoriaService,
   ],
 })
 export class SharedModule {}

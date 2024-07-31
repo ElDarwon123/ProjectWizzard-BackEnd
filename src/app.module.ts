@@ -13,6 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { strict } from 'assert';
 import { join } from 'path';
+import { ConvocatoriaModule } from './convocatoria/convocatoria.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { join } from 'path';
     FilesModule,
     SeccionModule,
     RevisionModule,
+    ConvocatoriaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
