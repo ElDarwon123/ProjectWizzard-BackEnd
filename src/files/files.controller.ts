@@ -14,13 +14,14 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
 import { ApiTags } from '@nestjs/swagger';
+import { MulterFilee } from './global';
 
 const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 
 @ApiTags('Archivo')
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) { }
+  constructor(private readonly filesService: FilesService) {}
 
   @Post('upload')
   @UseInterceptors(
@@ -40,7 +41,7 @@ export class FilesController {
       },
     }),
   )
-  async uploadFile(@UploadedFile() file: Express.MulterFile) {
+  async uploadFile(@UploadedFile() file: MulterFilee) {
     if (!file) {
       throw new BadRequestException('File is not received');
     }

@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from 'class-validator';
 import { RolesEnum } from 'src/enums/role.enum';
 
 export class CreateUsuarioDto {
@@ -27,4 +27,7 @@ export class CreateUsuarioDto {
   @IsNotEmpty()
   @IsEnum(RolesEnum)
   role: string;
+  @IsString()
+  @IsOptional()
+  image: string;
 }

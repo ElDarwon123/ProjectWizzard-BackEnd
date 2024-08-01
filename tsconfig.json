@@ -20,9 +20,7 @@
   } ,
   
   
-  // nuevo
-  //global.d.ts sea incluido en el proceso de compilación
-  "include": ["src/**/*.ts", "src/global.d.ts"],  // Asegúrate de incluir esta línea
+  "include": ["src/**/*.ts", "src/global.d.ts"],  
   "exclude": ["node_modules"]
 
 }

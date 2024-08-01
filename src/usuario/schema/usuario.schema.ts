@@ -52,6 +52,10 @@ export class Usuario extends Document {
   @ApiProperty()
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Proyecto' })
   proyectos: ObjectId[];
+
+  @ApiProperty()
+  @Prop({ type: String })
+  icon: string
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

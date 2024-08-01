@@ -22,4 +22,8 @@ export class CreateProyectoDto {
   @IsMongoId()
   @IsNotEmpty()
   usuarioId: ObjectId;
+
+  @IsOptional()
+  @IsString()
+  image: string;
 }

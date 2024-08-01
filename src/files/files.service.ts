@@ -4,15 +4,16 @@ import { Model } from 'mongoose';
 import { File, FileDocument } from './schemas/file.schema';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
+import { MulterFilee } from './global';
 
 @Injectable()
 export class FilesService {
   constructor(@InjectModel(File.name) private fileModel: Model<FileDocument>) { }
 
-  async create(file: Express.MulterFile): Promise<File> {
+  async create(file: MulterFilee): Promise<File> {
     const createdFile = new this.fileModel({
       filename: file.originalname,
-      path: "http://localhost:4000"+file.path,
+      path: "http://localhost:4000/"+file.path,
       mimetype: file.mimetype,
       size: file.size,
     });

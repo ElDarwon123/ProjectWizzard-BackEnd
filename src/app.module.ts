@@ -15,9 +15,13 @@ import { strict } from 'assert';
 import { join } from 'path';
 import { ConvocatoriaModule } from './convocatoria/convocatoria.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: './uploads'
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

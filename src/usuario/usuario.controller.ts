@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -16,8 +17,8 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { RolesEnum } from 'src/enums/role.enum';
 import { ApiTags } from '@nestjs/swagger';
-//import { Roles } from 'src/decorators/roles.decorator';
-//import { RolesGuard } from 'src/role/role.guard';
+import { ObjectId, Types } from 'mongoose';
+import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 
 @ApiTags('Usuario')
 @Controller('auth/usuario')
@@ -48,8 +49,25 @@ export class UsuarioController {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
 
+  @Patch(':id/device-token')
+  async updateDeviceToken(
+    @Param('id') id: Types.ObjectId,
+    @Body() updateDeviceToken: UpdateDeviceTokenDto,
+  ) {
+    const updateUser = await this.usuarioService.updateDeviceToken(
+      id,
+      updateDeviceToken,
+    );
+    if (!updateUser) {
+      throw new NotFoundException('User not found');
+    }
+    return updateUser;
+  }
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(RolesEnum.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  remove(@Param('id') id: Types.ObjectId) {
     return this.usuarioService.remove(id);
   }
 }

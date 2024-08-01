@@ -8,6 +8,7 @@ import { Model, ObjectId, Types } from 'mongoose';
 import { Usuario } from './schema/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -66,7 +67,17 @@ export class UsuarioService {
     });
   }
 
-  async remove(id: string) {
+  async updateDeviceToken(
+    id: Types.ObjectId,
+    deviceToken: UpdateDeviceTokenDto,
+  ) {
+    const upDevice = await this.usuarioModel
+      .findByIdAndUpdate(id, { deviceToken }, { new: true })
+      .exec();
+    return upDevice;
+  }
+
+  async remove(id: Types.ObjectId) {
     return this.usuarioModel.findByIdAndDelete(id);
   }
 }

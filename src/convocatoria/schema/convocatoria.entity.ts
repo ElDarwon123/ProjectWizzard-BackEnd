@@ -25,7 +25,6 @@ export class Convocatoria extends Document {
   fechaCierre: Date;
   @ApiProperty()
   @Prop({
-    required: true,
     enum: estadoConvocatoria,
     default: estadoConvocatoria.ACTIVE,
   })
