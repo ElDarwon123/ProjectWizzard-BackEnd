@@ -38,8 +38,6 @@ export class UsuarioController {
   }
 
   @Get(':id')
-  @Roles(RolesEnum.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
   findOne(@Param('id') id: string) {
     return this.usuarioService.findOne(id);
   }
