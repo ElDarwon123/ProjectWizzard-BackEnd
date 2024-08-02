@@ -79,7 +79,7 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
-    const resetUrl = `http://localhost:5173/reset-password?token=${token}`;
+    const resetUrl = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/reset-password?token=${token}`;
 
     try {
       await this.mailerService.sendMail({
