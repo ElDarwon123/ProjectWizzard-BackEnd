@@ -22,7 +22,7 @@ export class ConvocatoriaController {
   @Post()
   create(
     @Body() createConvocatoriaDto: CreateConvocatoriaDto,
-    @Headers() headers: any,
+    @Headers('device-token') headers: any,
   ) {
     return this.convocatoriaService.create(createConvocatoriaDto, headers);
   }

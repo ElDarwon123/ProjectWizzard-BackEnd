@@ -54,7 +54,7 @@ export class ProyectoService {
         imageDestination,
         imageMymeType,
       );
-      createProyectoDto.image = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_STORAGE_BUCKET')}/o/${encodeURIComponent(imageDestination)}?alt=media`;
+      createProyectoDto.image = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(imageDestination)}?alt=media`;
     }
 
     const createdProyecto = new this.proyectoModel(createProyectoDto);

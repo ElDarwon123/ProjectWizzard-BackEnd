@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Convocatoria } from './schema/convocatoria.entity';
 import { Model, Types } from 'mongoose';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import { Request } from 'express';
 
 @Injectable()
 export class ConvocatoriaService {
