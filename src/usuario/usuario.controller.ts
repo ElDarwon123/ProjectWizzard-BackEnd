@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   NotFoundException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -19,6 +21,8 @@ import { RolesEnum } from 'src/enums/role.enum';
 import { ApiTags } from '@nestjs/swagger';
 import { ObjectId, Types } from 'mongoose';
 import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Usuario } from './schema/usuario.schema';
 
 @ApiTags('Usuario')
 @Controller('auth/usuario')
@@ -26,8 +30,23 @@ export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuarioService.create(createUsuarioDto);
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() createUsuarioDto: CreateUsuarioDto,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    const imageBuffer = image ? image.buffer : undefined;
+    const imageDestination = image
+      ? `projects/${createUsuarioDto.email}/cover.${image.originalname.split('.').pop()}`
+      : undefined;
+    const imageMymeType = image ? image.mimetype : undefined;
+
+    return this.usuarioService.create(
+      createUsuarioDto,
+      imageBuffer,
+      imageDestination,
+      imageMymeType,
+    );
   }
 
   @Get()
@@ -43,7 +62,12 @@ export class UsuarioController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+  @UseInterceptors(FileInterceptor('image'))
+  update(
+    @Param('id') id: string,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+    @UploadedFile() image: Express.Multer.File,
+  ): Promise<Usuario> {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
 
@@ -56,13 +80,9 @@ export class UsuarioController {
       id,
       updateDeviceToken,
     );
-    if (!updateUser) {
-      throw new NotFoundException('User not found');
-    }
     return updateUser;
   }
 
-  @Delete(':id')
   @Roles(RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   remove(@Param('id') id: Types.ObjectId) {

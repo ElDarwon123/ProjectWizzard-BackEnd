@@ -7,15 +7,15 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
-import { Express } from 'express';
-import { MulterField } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { Readable } from 'stream';
 
 @Injectable()
 export class FirebaseService {
   private bucket: Bucket;
 
-  constructor(@Inject() private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+  ) {
     admin.apps.length
       ? admin.app
       : admin.initializeApp({
@@ -31,21 +31,44 @@ export class FirebaseService {
     this.bucket = admin.storage().bucket();
   }
 
-  async sendPushNotification(token: string, title: string, body: string) {
-    const payload = {
-      token,
-      notification: {
-        title,
-        body,
-      },
-    };
-    try {
-      await admin.messaging().send(payload);
-      console.log('notificacion sent');
-    } catch (error) {
-      console.error('Error sending notification:', error);
-    }
-  }
+  // async sendPushNotification(title: string, body: string, link: string) {
+    
+  //   const tokens = await this.usuarioService.getAllTokenFCM();
+
+  //   const message = tokens.map(token => ({
+  //     tokens,
+  //     notification: {
+  //       title,
+  //       body,
+  //     },
+  //     webpush: {
+  //       notification: {
+  //         title,
+  //         body,
+  //         link
+  //       }
+  //     }
+  //   }));
+  //   try {
+  //     const response = await admin.messaging().sendEachForMulticast({
+  //       tokens,
+  //       notification: {
+  //         title,
+  //         body,
+  //       },
+  //       webpush: {
+  //         notification: {
+  //           title,
+  //           body,
+  //           link,
+  //         }
+  //       },
+  //     });
+  //     console.log('notificacion sent', response);
+  //   } catch (error) {
+  //     console.error('Error sending notification:', error);
+  //   }
+  // }
 
   async uploadFile(buffer: Buffer, destination: string, mimetype: string): Promise<void> {
 

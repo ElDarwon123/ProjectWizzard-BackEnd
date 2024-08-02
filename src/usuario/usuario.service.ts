@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,14 +10,32 @@ import { Usuario } from './schema/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
+import { ConfigService } from '@nestjs/config';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class UsuarioService {
   constructor(
     @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
+    @Inject() private readonly configService: ConfigService,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
-  async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
+  async create(
+    createUsuarioDto: CreateUsuarioDto,
+    imageBuffer: Buffer,
+    imageDestination: string,
+    imageMymetype: string,
+  ): Promise<Usuario> {
+    if (imageBuffer || imageDestination || imageMymetype) {
+      await this.firebaseService.uploadFile(
+        imageBuffer,
+        imageDestination,
+        imageMymetype,
+      );
+      createUsuarioDto.image = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(imageDestination)}?alt=media`;
+    }
+
     const existingUser = await this.usuarioModel.findOne({
       email: createUsuarioDto.email,
     });
@@ -55,7 +74,7 @@ export class UsuarioService {
     return this.usuarioModel.findOne({ email }).populate('proyectos').exec();
   }
 
-  async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
+  async update(id: string, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario> {
     const existingUser = await this.usuarioModel.findOne({
       email: updateUsuarioDto.email,
     });
@@ -65,6 +84,11 @@ export class UsuarioService {
     return this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, {
       new: true,
     });
+  }
+
+  async getAllTokenFCM(): Promise<string[]> {
+    const users = await this.usuarioModel.find({ fcmToken: { $exists: true } }).select('fcmToken');
+    return users.map(user => user.fcmToken).filter(token => !!token);
   }
 
   async updateDeviceToken(

@@ -5,6 +5,7 @@ import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { RolesEnum } from 'src/enums/role.enum';
 import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
+import { Types } from 'mongoose';
 
 @Schema()
 export class Usuario extends Document {
@@ -55,7 +56,11 @@ export class Usuario extends Document {
 
   @ApiProperty()
   @Prop({ type: String })
-  icon: string
+  image?: string;
+
+  @ApiProperty()
+  @Prop({ type: String })
+  fcmToken?: string;
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

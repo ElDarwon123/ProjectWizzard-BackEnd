@@ -42,4 +42,7 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   role?: string;
   @IsOptional()
   proyectos: Proyecto;
+  @IsOptional()
+  @IsString()
+  image?: string;
 }

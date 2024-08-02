@@ -25,7 +25,7 @@ export class ConvocatoriaService {
     }
     const title = 'Nueva convocatoria!';
     const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
-    await this.firebaseService.sendPushNotification(token, title, body);
+    //await this.firebaseService.sendPushNotification(token, title, body);
     return newCon;
   }
 

@@ -27,7 +27,10 @@ export class CreateUsuarioDto {
   @IsNotEmpty()
   @IsEnum(RolesEnum)
   role: string;
-  @IsString()
   @IsOptional()
-  image: string;
+  @IsString()
+  image?: string;
+  @IsOptional()
+  @IsString()
+  fcmToken?: string;
 }

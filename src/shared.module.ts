@@ -15,6 +15,7 @@ import { AuthService } from './auth/auth.service';
 import { Convocatoria, convocatoriaSchema } from './convocatoria/schema/convocatoria.entity';
 import { ConvocatoriaService } from './convocatoria/convocatoria.service';
 import { FirebaseService } from './firebase/firebase.service';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FirebaseService } from './firebase/firebase.service';
     AuthService,
     ConvocatoriaService,
     FirebaseService,
+    ConfigService,
   ],
   exports: [
     ProyectoService,
@@ -48,6 +50,7 @@ import { FirebaseService } from './firebase/firebase.service';
     AuthService,
     ConvocatoriaService,
     FirebaseService,
+    ConfigService,
   ],
 })
 export class SharedModule {}
