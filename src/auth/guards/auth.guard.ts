@@ -9,15 +9,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
-import { jwtConstants } from '../constants';
 import { Request } from 'express';
 import { AuthService } from '../auth.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
+    private configService: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +29,7 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payLoad = this.jwtService.verifyAsync(token, {
-        secret: jwtConstants,
+        secret: this.configService.get<string>('JWT_SECRET'),
       });
       if (payLoad instanceof TokenExpiredError) {
         throw new UnauthorizedException('Invalid token expired');

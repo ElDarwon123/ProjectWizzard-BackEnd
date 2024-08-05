@@ -14,6 +14,9 @@ import { FirebaseService } from 'src/firebase/firebase.service';
 import { File } from '../files/schemas/file.schema';
 import { ConfigService } from '@nestjs/config';
 import { buffer } from 'stream/consumers';
+import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
+import { Body } from '@nestjs/common';
+import { EstadoProyecto } from 'src/enums/estado-proyecto.enum';
 
 @Injectable()
 export class ProyectoService {
@@ -21,6 +24,7 @@ export class ProyectoService {
     @InjectModel(Proyecto.name) private proyectoModel: Model<Proyecto>,
     private readonly usuarioService: UsuarioService,
     private readonly firebaseService: FirebaseService,
+    private readonly notiService: NotificacionesService,
     @Inject() private readonly configService: ConfigService,
   ) {}
 
@@ -118,6 +122,7 @@ export class ProyectoService {
       throw new NotFoundException('Project not found');
     }
     proj.revisiones.push(revisionId);
+
     await proj.save();
     return proj;
   }
@@ -130,7 +135,24 @@ export class ProyectoService {
       .findByIdAndUpdate(id, updateProyectoDto, { new: true })
       .exec();
     if (!updatedProyecto) {
-      throw new NotFoundException(`Proyecto with ID ${id} not found`);
+      throw new NotFoundException(`Proyecto not found`);
+    }
+    if (
+      updatedProyecto.estado === EstadoProyecto.EN_REVISION ||
+      updatedProyecto.estado === EstadoProyecto.REVISADO ||
+      updatedProyecto.estado === EstadoProyecto.COMPLETADO ||
+      updatedProyecto.estado === EstadoProyecto.RECHAZADO
+    ) {
+      const title = `Tu Proyecto ${updatedProyecto.titulo} fue Juzgado!`;
+      const body = `Tu proyecto ha sido juzgado por los magos, ellos dicen que está ${updatedProyecto.estado}, mira que más han dicho de tu proyecto.`;
+      const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/administrador/review?id=${updatedProyecto.id}`;
+      await this.notiService.createNotiProject({
+        title,
+        body,
+        url,
+        proyecto: updatedProyecto.id,
+      });
+      return updatedProyecto;
     }
     return updatedProyecto;
   }

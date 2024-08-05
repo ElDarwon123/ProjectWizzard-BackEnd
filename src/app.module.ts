@@ -16,6 +16,7 @@ import { join } from 'path';
 import { ConvocatoriaModule } from './convocatoria/convocatoria.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { NotificacionesModule } from './notificaciones/notificaciones.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { MulterModule } from '@nestjs/platform-express';
     RevisionModule,
     ConvocatoriaModule,
     FirebaseModule,
+    NotificacionesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

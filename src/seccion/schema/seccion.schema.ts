@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Proyecto } from '../../proyecto/schema/proyecto.shema';
 import * as mongoose from 'mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty,  } from '@nestjs/swagger';
 
 export class TipoSeccion {
   @ApiProperty()

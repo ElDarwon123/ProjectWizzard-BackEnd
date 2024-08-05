@@ -3,6 +3,7 @@ import mongoose, {
   Document,
   Schema as MongooseSchema,
   ObjectId,
+  Types,
 } from 'mongoose';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 import { ApiProperty } from '@nestjs/swagger';
@@ -35,7 +36,7 @@ export class Proyecto extends Document {
 
   @ApiProperty()
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Usuario', required: true })
-  usuarioId: ObjectId;
+  usuarioId: Usuario;
 
   @ApiProperty()
   @Prop({

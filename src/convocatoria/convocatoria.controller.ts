@@ -22,9 +22,8 @@ export class ConvocatoriaController {
   @Post()
   create(
     @Body() createConvocatoriaDto: CreateConvocatoriaDto,
-    @Headers('device-token') headers: any,
   ) {
-    return this.convocatoriaService.create(createConvocatoriaDto, headers);
+    return this.convocatoriaService.create(createConvocatoriaDto);
   }
 
   @Get()

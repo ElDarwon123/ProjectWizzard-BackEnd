@@ -2,10 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateConvocatoriaDto } from './dto/create-convocatoria.dto';
 import { UpdateConvocatoriaDto } from './dto/update-convocatoria.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Convocatoria } from './schema/convocatoria.entity';
+import { Convocatoria } from './schemas/convocatoria.entity';
 import { Model, Types } from 'mongoose';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { Request } from 'express';
+import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
 
 @Injectable()
 export class ConvocatoriaService {
@@ -13,19 +14,22 @@ export class ConvocatoriaService {
     @InjectModel(Convocatoria.name)
     private readonly convocatoriaModel: Model<Convocatoria>,
     private readonly firebaseService: FirebaseService,
+    private readonly notisService: NotificacionesService,
   ) {}
 
-  async create(createConvocatoriaDto: CreateConvocatoriaDto, headers: any) {
+  async create(createConvocatoriaDto: CreateConvocatoriaDto) {
     const newCon = new this.convocatoriaModel(createConvocatoriaDto);
     await newCon.save();
 
-    const token = headers['device-token'];
-    if (!token) {
-      throw new NotFoundException('Device token not found');
-    }
     const title = 'Nueva convocatoria!';
     const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
-    //await this.firebaseService.sendPushNotification(token, title, body);
+    const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/convocatoria?id=${newCon.id}`;
+    this.notisService.createNotiAnnouncement({
+      title,
+      body,
+      url,
+      convocatoria: newCon.id
+    })
     return newCon;
   }
 

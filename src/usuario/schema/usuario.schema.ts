@@ -9,31 +9,31 @@ import { Types } from 'mongoose';
 
 @Schema()
 export class Usuario extends Document {
-  @ApiProperty()
   @Prop({ required: true })
+  @ApiProperty()
   nombre: string;
 
-  @ApiProperty()
   @Prop({ required: true })
+  @ApiProperty()
   apellido: string;
 
-  @ApiProperty()
   @Prop({ required: true, unique: true })
+  @ApiProperty()
   email: string;
 
-  @ApiProperty()
   @Prop({ required: true })
+  @ApiProperty()
   numIdentificacion: string;
 
-  @ApiProperty()
   @Prop()
+  @ApiProperty()
   telefono: string;
 
-  @ApiProperty()
   @Prop({
     required: true,
     set: (value: string) => new Date(value),
   })
+  @ApiProperty()
   fechaNacimiento: Date;
 
   @ApiProperty()

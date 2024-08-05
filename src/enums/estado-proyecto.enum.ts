@@ -1,9 +1,10 @@
 // proyectos/estado-proyecto.enum.ts
 
 export enum EstadoProyecto {
-    EN_PROGRESO = 'En progreso',
-    COMPLETADO = 'Completado',
-    CANCELADO = 'Cancelado',
-    PENDIENTE = 'Pendiente',
-  }
-  
+  EN_PROGRESO = 'En progreso',
+  COMPLETADO = 'Completado',
+  RECHAZADO = 'Rechazado',
+  PENDIENTE = 'Pendiente',
+  EN_REVISION = 'En revision',
+  REVISADO = 'Revisado',
+}

@@ -18,6 +18,10 @@ export class CreateRevisionDto {
   estado: EstadoRevision;
   @IsString()
   @IsNotEmpty()
+  @MinLength(3)
+  titulo: string;
+  @IsString()
+  @IsNotEmpty()
   @MinLength(6)
   sugerencia: string;
   @IsString()

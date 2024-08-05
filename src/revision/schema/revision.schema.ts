@@ -16,9 +16,12 @@ export class Revision extends Document {
   @ApiProperty()
   @Prop({
     required: true,
-    enum: EstadoRevision
+    enum: EstadoRevision,
   })
   estado: EstadoRevision;
+  @ApiProperty()
+  @Prop({ type: String, required: true })
+  titulo: string;
   @ApiProperty()
   @Prop({ type: String, required: true })
   sugerencia: String;
@@ -29,8 +32,12 @@ export class Revision extends Document {
   @Prop({ default: Date.now })
   fechaRevision: Date;
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Proyecto', required: true })
-  proyecto: ObjectId
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Proyecto',
+    required: true,
+  })
+  proyecto: ObjectId;
 }
 
 export const revisionSchema = SchemaFactory.createForClass(Revision);

@@ -18,7 +18,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { RolesEnum } from 'src/enums/role.enum';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ObjectId, Types } from 'mongoose';
 import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -31,6 +31,7 @@ export class UsuarioController {
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
+  @ApiBody({type: CreateUsuarioDto })
   create(
     @Body() createUsuarioDto: CreateUsuarioDto,
     @UploadedFile() image: Express.Multer.File,
