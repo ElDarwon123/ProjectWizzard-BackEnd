@@ -13,9 +13,9 @@ async function bootstrap() {
     allowedHeaders: 'Authorization, Content-Type, Accept',
   });
   const conf = new DocumentBuilder()
-    .setTitle('AgroEmprende')
+    .setTitle('ProjectWizzard')
     .setDescription("it's a formative project")
-    .setVersion('2.0.0')
+    .setVersion('1.5.7')
     .build();
   const doc = SwaggerModule.createDocument(app, conf);
   SwaggerModule.setup('api', app, doc);

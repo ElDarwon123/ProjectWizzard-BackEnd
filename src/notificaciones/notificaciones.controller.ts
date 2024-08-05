@@ -17,7 +17,9 @@ import { CreateNotiAnnouncementDto } from './dto/create-notificacion.dto';
 import { UpdateNotiAnnouncementDto } from './dto/update-notificacion-convocatoria.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Request as Requ } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Notificaciones')
 @Controller('notificaciones')
 export class NotificacionesController {
   constructor(private readonly notificacionesService: NotificacionesService) {}
