@@ -14,6 +14,9 @@ import { CreateBlackList } from './dto/create-blackList.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
+import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
+import { ProyectoService } from 'src/proyecto/proyecto.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +24,8 @@ export class AuthService {
     private userService: UsuarioService,
     private jwtService: JwtService,
     private mailerService: MailerService,
+    private projectService: ProyectoService,
+    private configService: ConfigService,
     @InjectModel(BlackList.name) private readonly blackList: Model<BlackList>,
     @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
   ) {}
@@ -35,10 +40,10 @@ export class AuthService {
 
       const isMatch = await bcrypt.compare(pass, user.contrasena);
       console.log(pass);
-      
+
       console.log(isMatch);
       console.log(user.contrasena);
-      
+
       if (!isMatch) {
         throw new UnauthorizedException('Invalid Credentials');
       }
@@ -114,10 +119,51 @@ export class AuthService {
       if (!user) {
         throw new NotFoundException('User not found');
       }
-      const newPP = this.usuarioModel.findByIdAndUpdate(id, newPassword)
+      const newPP = this.usuarioModel.findByIdAndUpdate(id, newPassword);
       return newPP;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  async sendNotificationEmail(
+    email: string,
+    project: string,
+  ): Promise<{ pass_token: string }> {
+    const user = await this.userService.findByEmail(email);
+    const proj = await this.projectService.findOne(project);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    } else if (!proj) {
+      throw new NotFoundException('Project not found');
+    }
+    console.log(user);
+
+    const token = await this.jwtService.signAsync(
+      { email: user.email, id: user._id },
+      { expiresIn: '1h', secret: this.configService.get<string>('JWT_SECRET') }
+    );
+
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Notificación sobre tu proyecto',
+        template: 'notification-email',
+        context: {
+          name: user.nombre,
+          proyecto: proj.titulo,
+          estado: proj.estado,
+        },
+      });
+      return {
+        pass_token: token,
+      };
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new TokenExpiredError('Token Expired', new Date());
+      }
+      throw new JsonWebTokenError(error);
     }
   }
 }

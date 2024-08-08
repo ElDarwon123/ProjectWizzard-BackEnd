@@ -11,12 +11,11 @@ import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { FirebaseService } from 'src/firebase/firebase.service';
-import { File } from '../files/schemas/file.schema';
 import { ConfigService } from '@nestjs/config';
-import { buffer } from 'stream/consumers';
 import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
-import { Body } from '@nestjs/common';
 import { EstadoProyecto } from 'src/enums/estado-proyecto.enum';
+import { AuthService } from 'src/auth/auth.service';
+import { forwardRef } from '@nestjs/common';
 
 @Injectable()
 export class ProyectoService {
@@ -25,7 +24,8 @@ export class ProyectoService {
     private readonly usuarioService: UsuarioService,
     private readonly firebaseService: FirebaseService,
     private readonly notiService: NotificacionesService,
-    @Inject() private readonly configService: ConfigService,
+    private readonly configService: ConfigService,
+    @Inject(forwardRef(()=>AuthService)) private readonly authService: AuthService,
   ) {}
 
   async findAll(): Promise<Proyecto[]> {
@@ -45,7 +45,7 @@ export class ProyectoService {
     }
     return proyecto;
   }
-
+  
   async create(
     createProyectoDto: CreateProyectoDto,
     imageBuffer?: Buffer,
@@ -70,6 +70,17 @@ export class ProyectoService {
       createProyectoDto.usuarioId,
       proyecto.id,
     );
+
+    const title = 'Se ha subido un nuevo proyecto!';
+    const body = 'Ha llegado un nuevo proyecto al gremio, vamos a revisarlo!';
+    const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/proyectos/${proyecto.id}`;
+
+    await this.notiService.createNotiProject({
+      title,
+      body,
+      proyecto: proyecto.id,
+      url,
+    });
 
     return proyecto;
   }
@@ -133,6 +144,9 @@ export class ProyectoService {
   ): Promise<Proyecto> {
     const updatedProyecto = await this.proyectoModel
       .findByIdAndUpdate(id, updateProyectoDto, { new: true })
+      .populate({
+        path: 'usuarioId',
+      })
       .exec();
     if (!updatedProyecto) {
       throw new NotFoundException(`Proyecto not found`);
@@ -152,6 +166,11 @@ export class ProyectoService {
         url,
         proyecto: updatedProyecto.id,
       });
+      const userEmail = updatedProyecto.usuarioId.email;
+      await this.authService.sendNotificationEmail(
+        userEmail,
+        updatedProyecto.id,
+      );
       return updatedProyecto;
     }
     return updatedProyecto;

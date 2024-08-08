@@ -21,20 +21,24 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { RolesEnum } from 'src/enums/role.enum';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ObjectId } from 'mongoose';
+import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('Proyecto')
 @Controller('proyectos')
 export class ProyectoController {
   constructor(
     private readonly proyectoService: ProyectoService,
-    private readonly usuarioService: UsuarioService,
+    private readonly authService: AuthService
   ) {}
 
   @Post()
+  @ApiBody({ type: CreateProyectoDto })
+  @ApiResponse({ type: Proyecto, status: 200 })
+  @ApiBearerAuth('token')
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
@@ -68,6 +72,8 @@ export class ProyectoController {
   }
 
   @Get()
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   findAll(): Promise<Proyecto[]> {
@@ -75,6 +81,8 @@ export class ProyectoController {
   }
 
   @Get(':id')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   findOne(@Param('id') id: string): Promise<Proyecto> {
@@ -82,6 +90,8 @@ export class ProyectoController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
@@ -93,6 +103,8 @@ export class ProyectoController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
   @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   remove(@Param('id') id: string): Promise<Proyecto> {

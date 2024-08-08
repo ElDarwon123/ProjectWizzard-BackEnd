@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSeccionDto } from './dto/create-seccion.dto';
 import { UpdateSeccionDto } from './dto/update-seccion.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,41 +14,64 @@ export class SeccionService {
   ) {}
 
   async create(createSeccionDto: CreateSeccionDto) {
-    const newSec = new this.seccionModel(createSeccionDto);
-    const secc = await newSec.save();
+    try {
+          const newSec = new this.seccionModel(createSeccionDto);
+          const secc = await newSec.save();
 
-    await this.projectService.addSeccionToProject(
-      createSeccionDto.proyecto,
-      secc.id,
-    );
-    return secc.populate('proyecto');
+          await this.projectService.addSeccionToProject(
+            createSeccionDto.proyecto,
+            secc.id,
+          );
+          return secc.populate('proyecto');
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async findAll(): Promise<Seccion[]> {
-    const Seccs = await this.seccionModel.find().populate('proyecto').exec();
-    return Seccs;
+    try {
+          const Seccs = await this.seccionModel
+            .find()
+            .populate('proyecto')
+            .exec();
+          return Seccs;
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
   }
 
   async findOne(id: string) {
-    const Secc = await this.seccionModel
-      .findById(id)
-      .populate('proyecto')
-      .exec();
-    return Secc;
+    try {
+          const Secc = await this.seccionModel
+            .findById(id)
+            .populate('proyecto')
+            .exec();
+          return Secc;
+    } catch (error) {
+      throw new NotFoundException('not found coso');
+    }
   }
 
   async update(id: string, updateSeccionDto: UpdateSeccionDto) {
-    const newSecc = await this.seccionModel
-      .findByIdAndUpdate(id, updateSeccionDto, {
-        new: true,
-      })
-      .populate('proyecto')
-      .exec();
-    return newSecc;
+    try {
+          const newSecc = await this.seccionModel
+            .findByIdAndUpdate(id, updateSeccionDto, {
+              new: true,
+            })
+            .populate('proyecto')
+            .exec();
+          return newSecc;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async remove(id: string) {
-    const delSecc = await this.seccionModel.findByIdAndDelete(id);
-    return delSecc;
+    try {
+          const delSecc = await this.seccionModel.findByIdAndDelete(id);
+          return delSecc;
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
   }
 }

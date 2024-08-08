@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateConvocatoriaDto } from './dto/create-convocatoria.dto';
 import { UpdateConvocatoriaDto } from './dto/update-convocatoria.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -18,45 +22,65 @@ export class ConvocatoriaService {
   ) {}
 
   async create(createConvocatoriaDto: CreateConvocatoriaDto) {
-    const newCon = new this.convocatoriaModel(createConvocatoriaDto);
-    await newCon.save();
+    try {
+      const newCon = new this.convocatoriaModel(createConvocatoriaDto);
+      await newCon.save();
 
-    const title = 'Nueva convocatoria!';
-    const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
-    const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/convocatoria?id=${newCon.id}`;
-    this.notisService.createNotiAnnouncement({
-      title,
-      body,
-      url,
-      convocatoria: newCon.id
-    })
-    return newCon;
+      const title = 'Nueva convocatoria!';
+      const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
+      const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/convocatoria?id=${newCon.id}`;
+      this.notisService.createNotiAnnouncement({
+        title,
+        body,
+        url,
+        convocatoria: newCon.id,
+      });
+      return newCon;
+    } catch (error) {
+      throw new BadRequestException();
+    }
   }
 
   async findAll(): Promise<Convocatoria[]> {
-    const convs = await this.convocatoriaModel.find();
-    return convs;
+    try {
+      const convs = await this.convocatoriaModel.find();
+      return convs;
+    } catch (error) {
+      throw new NotFoundException('Announcement not found');
+    }
   }
 
   async findOne(id: Types.ObjectId) {
-    const conv = await this.convocatoriaModel.findById(id);
-    return conv;
+    try {
+      const conv = await this.convocatoriaModel.findById(id);
+      return conv;
+    } catch (error) {
+      throw new NotFoundException('Announcement not found');
+    }
   }
 
   async update(
     id: Types.ObjectId,
     updateConvocatoriaDto: UpdateConvocatoriaDto,
   ) {
-    const conv = await this.convocatoriaModel.findByIdAndUpdate(
-      id,
-      updateConvocatoriaDto,
-      { new: true },
-    );
-    return conv;
+    try {
+      const conv = await this.convocatoriaModel.findByIdAndUpdate(
+        id,
+        updateConvocatoriaDto,
+        { new: true },
+      );
+      return conv;
+    } catch (error) {
+      throw new BadRequestException('Invalid id or body');
+    }
   }
 
   async remove(id: Types.ObjectId) {
-    const delConv = await this.convocatoriaModel.findByIdAndDelete(id);
-    return delConv;
+    try {
+      const delConv = await this.convocatoriaModel.findByIdAndDelete(id);
+      return delConv;
+    } catch (error) {
+      throw new NotFoundException('Announcement not found');
+    }
   }
 }

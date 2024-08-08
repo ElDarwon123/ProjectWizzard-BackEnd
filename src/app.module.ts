@@ -17,6 +17,7 @@ import { ConvocatoriaModule } from './convocatoria/convocatoria.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
+import { SharedModule } from './shared.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
     ConvocatoriaModule,
     FirebaseModule,
     NotificacionesModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

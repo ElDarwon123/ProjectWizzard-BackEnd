@@ -17,11 +17,13 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request as Requ, Response as Res } from 'express';
 import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
 import { CreateUsuarioDto } from 'src/usuario/dto/create-usuario.dto';
 import { sendEmail } from './dto/send-email.dto';
+import { Usuario } from 'src/usuario/schema/usuario.schema';
+import { CreateBlackList } from './dto/create-blackList.dto';
 // autenticatio
 @ApiTags('Autorizaciones, Iniciar Sesión y Ver Perfil')
 @Controller('auth')
@@ -30,6 +32,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
+  @ApiBody({ type: CreateAuthDto })
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.singIn(
       createAuthDto.email,
@@ -37,15 +40,18 @@ export class AuthController {
     );
   }
   // profile
-  @UseGuards(AuthGuard)
   @Get('profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Usuario, status: 200 })
   getProfile(@Request() req) {
     return req.user;
   }
-
+  @Post('logout')
+  @ApiBody({ type: CreateBlackList })
+  @ApiResponse({ type: 'Logout successful', status: 200 })
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  @Post('logout')
   async logOut(@Request() req: Requ, @Response() res: Res) {
     const token = req.headers.authorization.split(' ')[1];
     await this.authService.logOut({ token });
@@ -53,8 +59,12 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @ApiBody({ type: sendEmail })
+  @ApiResponse({ type: 'Email sent', status: 200 })
   async forgotPassword(@Body() user: sendEmail, @Response() res: Res) {
-    res.status(HttpStatus.OK).json(await this.authService.sendPassWordResetEmail(user.email));
+    res
+      .status(HttpStatus.OK)
+      .json(await this.authService.sendPassWordResetEmail(user.email));
   }
 
   @Patch('reset-password/:token')

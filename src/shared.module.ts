@@ -28,10 +28,13 @@ import {
   NotificacionConvocatoria,
 } from './notificaciones/schemas/notificacion-convocatoria.schema';
 import { NotificacionesService } from './notificaciones/notificaciones.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
+    forwardRef(() => AuthModule),
     MongooseModule.forFeature([
       { name: Proyecto.name, schema: ProyectoSchema },
       { name: Usuario.name, schema: usuarioSchema },
@@ -50,12 +53,12 @@ import { JwtService } from '@nestjs/jwt';
     SeccionService,
     RevisionService,
     FilesService,
-    AuthService,
     ConvocatoriaService,
     FirebaseService,
     ConfigService,
     NotificacionesService,
     JwtService,
+    AuthService,
   ],
   exports: [
     ProyectoService,
@@ -64,12 +67,12 @@ import { JwtService } from '@nestjs/jwt';
     RevisionService,
     FilesService,
     MongooseModule,
-    AuthService,
     ConvocatoriaService,
     FirebaseService,
     ConfigService,
     NotificacionesService,
     JwtService,
+    AuthService,
   ],
 })
 export class SharedModule {}

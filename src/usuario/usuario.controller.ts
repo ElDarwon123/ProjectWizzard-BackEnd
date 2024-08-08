@@ -18,7 +18,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { RolesEnum } from 'src/enums/role.enum';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ObjectId, Types } from 'mongoose';
 import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -31,7 +31,9 @@ export class UsuarioController {
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
-  @ApiBody({type: CreateUsuarioDto })
+  @ApiBearerAuth('token')
+  @ApiBody({ type: CreateUsuarioDto })
+  @ApiResponse({ type: Usuario, status: 200 })
   create(
     @Body() createUsuarioDto: CreateUsuarioDto,
     @UploadedFile() image: Express.Multer.File,
@@ -51,6 +53,8 @@ export class UsuarioController {
   }
 
   @Get()
+  @ApiResponse({ type: Usuario, status: 200 })
+  @ApiBearerAuth('token')
   @Roles(RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   findAll() {
@@ -58,11 +62,17 @@ export class UsuarioController {
   }
 
   @Get(':id')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Usuario, status: 200 })
+  @ApiParam({ name: 'id', type: 'ObjectId' })
   findOne(@Param('id') id: string) {
     return this.usuarioService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Usuario, status: 200 })
+  @ApiParam({ name: 'id', type: 'ObjectId' })
   @UseInterceptors(FileInterceptor('image'))
   update(
     @Param('id') id: string,
@@ -72,18 +82,10 @@ export class UsuarioController {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
 
-  @Patch(':id/device-token')
-  async updateDeviceToken(
-    @Param('id') id: Types.ObjectId,
-    @Body() updateDeviceToken: UpdateDeviceTokenDto,
-  ) {
-    const updateUser = await this.usuarioService.updateDeviceToken(
-      id,
-      updateDeviceToken,
-    );
-    return updateUser;
-  }
-
+  @Delete()
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Usuario, status: 200 })
+  @ApiParam({ name: 'id', type: 'ObjectId' })
   @Roles(RolesEnum.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   remove(@Param('id') id: Types.ObjectId) {
