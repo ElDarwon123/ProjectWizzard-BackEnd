@@ -14,7 +14,7 @@ export class CreateProyectoDto {
   @IsNotEmpty()
   fecha: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: EstadoProyecto })
   @IsEnum(EstadoProyecto)
   @IsOptional()
   estado?: EstadoProyecto;

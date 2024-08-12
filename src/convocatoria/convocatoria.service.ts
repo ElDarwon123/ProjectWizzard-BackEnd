@@ -11,6 +11,7 @@ import { Model, Types } from 'mongoose';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { Request } from 'express';
 import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
+import { notiStateEnum } from 'src/enums/estado-noti.enum';
 
 @Injectable()
 export class ConvocatoriaService {
@@ -32,6 +33,7 @@ export class ConvocatoriaService {
         title,
         body,
         convocatoria: newCon.id,
+        estado: notiStateEnum.NonViwed
       });
       return newCon;
     } catch (error) {

@@ -18,6 +18,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
+import { notiStateEnum } from 'src/enums/estado-noti.enum';
 
 @Injectable()
 export class ProyectoService {
@@ -181,6 +182,7 @@ export class ProyectoService {
       body,
       proyecto: proyecto.id,
       url,
+      estado: notiStateEnum.NonViwed
     });
 
     return proyecto;
@@ -271,6 +273,7 @@ export class ProyectoService {
         body,
         url,
         proyecto: updatedProyecto.id,
+        estado: notiStateEnum.NonViwed,
       });
       const userEmail = updatedProyecto.usuarioId.email;
       await this.authService.sendNotificationEmail(

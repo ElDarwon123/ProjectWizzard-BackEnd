@@ -1,5 +1,7 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
 export class sendEmail {
-    @IsEmail() 
-    email: string
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 }

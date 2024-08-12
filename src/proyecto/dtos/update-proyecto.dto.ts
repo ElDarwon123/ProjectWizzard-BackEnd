@@ -1,30 +1,8 @@
 import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { CreateProyectoDto } from './create.proyecto.dto';
 
-export class UpdateProyectoDto {
-  @IsString()
-  @IsOptional()
-  @ApiProperty()
-  titulo?: string;
+export class UpdateProyectoDto extends PartialType(CreateProyectoDto) {
 
-  @IsString()
-  @IsOptional()
-  @ApiProperty()
-  fecha?: string;
-
-  @IsEnum(EstadoProyecto)
-  @IsOptional()
-  @ApiProperty()
-  estado?: EstadoProyecto;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty()
-  descripcion?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty()
-  image?: string;
 }
