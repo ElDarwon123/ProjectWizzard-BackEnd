@@ -95,6 +95,12 @@ export class UsuarioService {
     }
   }
 
+  async HowManyUsers(): Promise<number> {
+    const users = await this.usuarioModel.find();
+    
+    return users.length;
+  }
+
   async update(
     id: string,
     updateUsuarioDto: UpdateUsuarioDto,

@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
@@ -36,7 +37,7 @@ export class RolesGuard implements CanActivate {
 
       return roles.includes(user.role);
     } catch (error) {
-      throw new ForbiddenException();
+      throw new UnauthorizedException('Invalid role');
     }
   }
 }

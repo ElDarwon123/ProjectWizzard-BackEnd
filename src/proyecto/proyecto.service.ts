@@ -42,7 +42,7 @@ export class ProyectoService {
       .exec();
   }
 
-  async findActives(token: any): Promise<Proyecto[]> {
+  async findActives(token: string): Promise<Proyecto[]> {
     let user: string;
     try {
       const decoded = await this.jwtService.decode(token);
@@ -61,6 +61,75 @@ export class ProyectoService {
       return filtered;
     } catch (error) {
       throw new NotFoundException(error.message);
+    }
+  }
+
+  async getProjectsByState(target: string) {
+    const totalProjects = await this.proyectoModel.countDocuments();
+
+    if (totalProjects === 0) {
+      return {
+        message: 'No hay proyectos',
+      };
+    }
+
+    const stOnReview = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.EN_REVISION,
+    });
+    const stComplete = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.COMPLETADO,
+    });
+    const stInProgress = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.EN_PROGRESO,
+    });
+    const stPending = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.PENDIENTE,
+    });
+    const stRefused = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.RECHAZADO,
+    });
+    const stReviewed = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.REVISADO,
+    });
+    const stReviewedWithErrors = await this.proyectoModel.countDocuments({
+      estado: EstadoProyecto.REViSADO_ERRORES,
+    });
+
+    switch (target) {
+      case 'percents':
+        const STOR = (stOnReview / totalProjects) * 100;
+        const STCOM = (stComplete / totalProjects) * 100;
+        const STIP = (stInProgress / totalProjects) * 100;
+        const STPEN = (stPending / totalProjects) * 100;
+        const STREF = (stRefused / totalProjects) * 100;
+        const STREV = (stReviewed / totalProjects) * 100;
+        const STREVERR = (stReviewedWithErrors / totalProjects) * 100;
+
+        return {
+          EN_REVISION: STOR,
+          COMPLETADOS: STCOM,
+          EN_PROGRESO: STIP,
+          PENDIENTE: STPEN,
+          RECHAZADOS: STREF,
+          REVISADOS: STREV,
+          REVISADOS_ERRORES: STREVERR,
+          TOTAL_PROYECTOS: totalProjects,
+        };
+      case 'integers':
+        return {
+          EN_REVISION: stOnReview,
+          COMPLETADOS: stComplete,
+          EN_PROGRESO: stInProgress,
+          PENDIENTE: stPending,
+          RECHAZADOS: stRefused,
+          REVISADOS: stReviewed,
+          REVISADOS_ERRORES: stReviewedWithErrors,
+          TOTAL_PROYECTOS: totalProjects,
+        };
+      default:
+        return {
+          message: 'No Projects',
+        };
     }
   }
 

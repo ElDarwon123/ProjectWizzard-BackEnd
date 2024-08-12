@@ -7,7 +7,7 @@ import { RolesEnum } from 'src/enums/role.enum';
 import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
 import { Types } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Usuario extends Document {
   @Prop({ required: true })
   @ApiProperty()

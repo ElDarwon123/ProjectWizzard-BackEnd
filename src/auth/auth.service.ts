@@ -41,13 +41,12 @@ export class AuthService {
       const isMatch = await bcrypt.compare(pass, user.contrasena);
       console.log(pass);
 
-      console.log(isMatch);
       console.log(user.contrasena);
 
       if (!isMatch) {
         throw new UnauthorizedException('Invalid Credentials');
       }
-      console.log(user);
+
       console.log('pasate');
       const payLoad = { sub: user, role: user.role };
       return {

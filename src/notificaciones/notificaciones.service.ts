@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateNotificacionProyectoDto } from './dto/create-notificacione.dto';
 import { UpdateNotificacionProyectoDto } from './dto/update-notificacion-proyecto.dto';
 import { CreateNotiAnnouncementDto } from './dto/create-notificacion.dto';
@@ -11,7 +16,6 @@ import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
-
 
 @Injectable()
 export class NotificacionesService {
@@ -29,21 +33,33 @@ export class NotificacionesService {
   async createNotiAnnouncement(
     createNotificacioneDto: CreateNotiAnnouncementDto,
   ): Promise<NotificacionConvocatoria> {
-    const noti = new this.notiConv(createNotificacioneDto);
-    await noti.save();
-    return noti;
+    try {
+      const noti = new this.notiConv(createNotificacioneDto);
+      await noti.save();
+      return noti;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async findAllNotiAnnouncement(): Promise<NotificacionConvocatoria[]> {
-    const notis = await this.notiConv.find().populate('convocatoria');
-    return notis;
+    try {
+      const notis = await this.notiConv.find().populate('convocatoria');
+      return notis;
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
   }
 
   async findOneNotiAnnouncement(
     id: Types.ObjectId,
   ): Promise<NotificacionConvocatoria> {
-    const noti = await this.notiConv.findById(id).populate('convocatoria');
-    return noti;
+    try {
+      const noti = await this.notiConv.findById(id).populate('convocatoria');
+      return noti;
+    } catch (error) {
+      throw new NotFoundException('Announcement not found');
+    }
   }
 
   async updateNotiAnnouncement(
@@ -74,60 +90,81 @@ export class NotificacionesService {
     return noti;
   }
 
-  //  When a project is created, the admin gets a notification 
+  //  When a project is created, the admin gets a notification
   async findAdminNotiProject(): Promise<NotificacionProyecto[]> {
-    const notis = await this.notiProject.find().exec();
+    try {
+      const notis = await this.notiProject.find().exec();
 
-    const filteredNotis = notis.filter((noti) => {
-      const nota = noti.title;
-      return nota === 'Se ha subido un nuevo proyecto!';
-    })
-    return filteredNotis;
+      const filteredNotis = notis.filter((noti) => {
+        const nota = noti.title;
+        return nota === 'Se ha subido un nuevo proyecto!';
+      });
+
+      return filteredNotis;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
-  
-  async findAllNotisProjects(token: any): Promise<NotificacionProyecto[]> {
 
+  async findAllNotisProjects(token: any): Promise<NotificacionProyecto[]> {
     let user: string;
     try {
       const decoded = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
       user = decoded.sub._id;
-      console.log(user);
-      
+
+      const notis = await this.notiProject
+        .find()
+        .populate({
+          path: 'proyecto',
+          select: 'usuarioId',
+        })
+        .exec();
+
+      const filteredNotis = notis.filter((noti) => {
+        const proyecto = noti.proyecto as Proyecto;
+        return (
+          proyecto.usuarioId.toString() === user &&
+          noti.title !== 'Se ha subido un nuevo proyecto!'
+        );
+      });
+
+      return filteredNotis;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
-    const notis = await this.notiProject.find().populate({
-      path: 'proyecto',
-      select: 'usuarioId'
-    }).exec();
-
-    const filteredNotis = notis.filter((noti) => {
-      const proyecto = noti.proyecto as Proyecto;      
-      return proyecto.usuarioId.toString() === user;
-    });
-    
-    return filteredNotis;
   }
 
   async findOneNotiProject(id: Types.ObjectId): Promise<NotificacionProyecto> {
-    const noti = await this.notiProject.findById(id).populate('proyecto');
-    return noti;
+    try {
+      const noti = await this.notiProject.findById(id).populate('proyecto');
+      return noti;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid Token');
+    }
   }
 
   async updateNotiProject(
     id: Types.ObjectId,
     updateNotificacioneDto: UpdateNotificacionProyectoDto,
   ): Promise<NotificacionProyecto> {
-    const noti = await this.notiProject
-      .findByIdAndUpdate(id, updateNotificacioneDto)
-      .populate('proyecto');
-    return noti;
+    try {
+      const noti = await this.notiProject
+        .findByIdAndUpdate(id, updateNotificacioneDto)
+        .populate('proyecto');
+      return noti;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 
   async removeNotiProject(id: Types.ObjectId): Promise<NotificacionProyecto> {
-    const delNoti = await this.notiProject.findByIdAndDelete(id);
-    return delNoti;
+    try {
+      const delNoti = await this.notiProject.findByIdAndDelete(id);
+      return delNoti;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

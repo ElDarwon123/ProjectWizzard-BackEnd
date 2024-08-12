@@ -28,11 +28,9 @@ export class ConvocatoriaService {
 
       const title = 'Nueva convocatoria!';
       const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
-      const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/convocatoria?id=${newCon.id}`;
       this.notisService.createNotiAnnouncement({
         title,
         body,
-        url,
         convocatoria: newCon.id,
       });
       return newCon;

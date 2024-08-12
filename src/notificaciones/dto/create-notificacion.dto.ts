@@ -17,9 +17,6 @@ export class CreateNotiAnnouncementDto {
   @IsNotEmpty()
   @MinLength(3)
   body: string;
-  @IsString()
-  @IsNotEmpty()
-  url: string;
   @IsMongoId()
   @IsNotEmpty()
   convocatoria: Convocatoria;

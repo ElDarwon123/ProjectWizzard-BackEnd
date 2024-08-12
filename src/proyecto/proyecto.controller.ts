@@ -96,6 +96,15 @@ export class ProyectoController {
     return this.proyectoService.findActives(token);
   }
 
+  @Get('percents')
+  getPercents() {
+    return this.proyectoService.getProjectsByState('percents');
+  }
+
+  @Get('bars')
+  getNumbers() {
+    return this.proyectoService.getProjectsByState('integers');
+  }
   @Get(':id')
   @ApiBearerAuth('token')
   @ApiResponse({ type: Proyecto, status: 200 })

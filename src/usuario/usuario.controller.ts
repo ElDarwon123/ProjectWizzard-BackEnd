@@ -61,6 +61,12 @@ export class UsuarioController {
     return this.usuarioService.findAll();
   }
 
+  @Get('counter')
+  @ApiResponse({ type: Number, status: 200 })
+  HowManyUsers() {
+    return this.usuarioService.HowManyUsers()
+  }
+
   @Get(':id')
   @ApiBearerAuth('token')
   @ApiResponse({ type: Usuario, status: 200 })
