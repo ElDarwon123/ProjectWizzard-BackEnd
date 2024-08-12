@@ -7,4 +7,5 @@ export enum EstadoProyecto {
   PENDIENTE = 'Pendiente',
   EN_REVISION = 'En revision',
   REVISADO = 'Revisado',
+  REViSADO_ERRORES='Revisado con errores',
 }

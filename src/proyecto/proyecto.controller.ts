@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { ProyectoService } from './proyecto.service';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
@@ -26,14 +27,17 @@ import { UsuarioService } from 'src/usuario/usuario.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ObjectId } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
+import { Request as Requ } from 'express';
 
 @ApiTags('Proyecto')
 @Controller('proyectos')
 export class ProyectoController {
   constructor(
     private readonly proyectoService: ProyectoService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
   ) {}
+
+  // ==== POST METHODS ====
 
   @Post()
   @ApiBody({ type: CreateProyectoDto })
@@ -71,6 +75,8 @@ export class ProyectoController {
     return { message: 'Files added successfully' };
   }
 
+  // ==== GET METHODS =====
+
   @Get()
   @ApiBearerAuth('token')
   @ApiResponse({ type: Proyecto, status: 200 })
@@ -78,6 +84,16 @@ export class ProyectoController {
   @UseGuards(AuthGuard, RolesGuard)
   findAll(): Promise<Proyecto[]> {
     return this.proyectoService.findAll();
+  }
+
+  @Get('actives')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
+  @Roles(RolesEnum.Admin, RolesEnum.Aprendiz)
+  @UseGuards(AuthGuard, RolesGuard)
+  getActives(@Request() req: Requ): Promise<Proyecto[]> {
+    const token = req.headers.authorization.split(' ')[1];
+    return this.proyectoService.findActives(token);
   }
 
   @Get(':id')
@@ -88,6 +104,8 @@ export class ProyectoController {
   findOne(@Param('id') id: string): Promise<Proyecto> {
     return this.proyectoService.findOne(id);
   }
+
+  // ==== PATCH METHODS ====
 
   @Patch(':id')
   @ApiBearerAuth('token')
@@ -101,6 +119,8 @@ export class ProyectoController {
   ): Promise<Proyecto> {
     return this.proyectoService.update(id, updateProyectoDto);
   }
+
+  // ==== DELETE METHODS ====
 
   @Delete(':id')
   @ApiBearerAuth('token')

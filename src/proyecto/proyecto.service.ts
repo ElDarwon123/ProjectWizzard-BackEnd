@@ -16,6 +16,8 @@ import { NotificacionesService } from 'src/notificaciones/notificaciones.service
 import { EstadoProyecto } from 'src/enums/estado-proyecto.enum';
 import { AuthService } from 'src/auth/auth.service';
 import { forwardRef } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Usuario } from 'src/usuario/schema/usuario.schema';
 
 @Injectable()
 export class ProyectoService {
@@ -25,9 +27,14 @@ export class ProyectoService {
     private readonly firebaseService: FirebaseService,
     private readonly notiService: NotificacionesService,
     private readonly configService: ConfigService,
-    @Inject(forwardRef(()=>AuthService)) private readonly authService: AuthService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
   ) {}
 
+  // ======== GET METHODS ======== //
+
+  // == GET ALL METHOD ==
   async findAll(): Promise<Proyecto[]> {
     return this.proyectoModel
       .find()
@@ -35,6 +42,29 @@ export class ProyectoService {
       .exec();
   }
 
+  async findActives(token: any): Promise<Proyecto[]> {
+    let user: string;
+    try {
+      const decoded = await this.jwtService.decode(token);
+      user = decoded.sub._id;
+
+      const filtered = await this.proyectoModel.find({ usuarioId: user });
+
+      filtered.filter((proj) => {
+        const projFiltered =
+          proj.estado === EstadoProyecto.EN_PROGRESO ||
+          EstadoProyecto.EN_REVISION ||
+          EstadoProyecto.PENDIENTE ||
+          EstadoProyecto.REViSADO_ERRORES;
+        return projFiltered;
+      });
+      return filtered;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
+  // ==== GET BY ID METHOD ====
   async findOne(id: string): Promise<Proyecto> {
     const proyecto = await this.proyectoModel
       .findById(id)
@@ -45,7 +75,9 @@ export class ProyectoService {
     }
     return proyecto;
   }
-  
+
+  // ==== CREATE METHODS ====
+
   async create(
     createProyectoDto: CreateProyectoDto,
     imageBuffer?: Buffer,
@@ -84,6 +116,9 @@ export class ProyectoService {
 
     return proyecto;
   }
+
+  // ==== ADDERs METHOD ====
+
   async addFileToProject(
     projectId: ObjectId,
     files: Express.Multer.File[],
@@ -138,6 +173,8 @@ export class ProyectoService {
     return proj;
   }
 
+  // ==== UPDATE METHOD ====
+
   async update(
     id: string,
     updateProyectoDto: UpdateProyectoDto,
@@ -175,6 +212,8 @@ export class ProyectoService {
     }
     return updatedProyecto;
   }
+
+  // ==== DELETE METHOD ====
 
   async remove(id: string): Promise<Proyecto> {
     const deletedProyecto = await this.proyectoModel
