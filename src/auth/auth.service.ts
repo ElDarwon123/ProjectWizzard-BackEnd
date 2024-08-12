@@ -51,7 +51,7 @@ export class AuthService {
       console.log('pasate');
       const payLoad = { sub: user, role: user.role };
       return {
-        access_token: await this.jwtService.signAsync(payLoad),
+        access_token: await this.jwtService.signAsync(payLoad, { secret: this.configService.get<string>('JWT_SECRET')}),
       };
     } catch (err) {
       throw new NotFoundException('Invalid Credentials');
@@ -79,9 +79,9 @@ export class AuthService {
     }
     console.log(user);
 
-    const token = await this.jwtService.sign(
+    const token = await this.jwtService.signAsync(
       { email: user.email, id: user._id },
-      { expiresIn: '1h' },
+      { expiresIn: '1h', secret: this.configService.get<string>('JWT_SECRET') },
     );
 
     const resetUrl = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/reset-password?token=${token}`;
@@ -112,7 +112,7 @@ export class AuthService {
     let email: string;
     let id: string;
     try {
-      const decoded = await this.jwtService.verifyAsync(token);
+      const decoded = await this.jwtService.verifyAsync(token, {secret: this.configService.get<string>('JWT_SECRET')});
       email = decoded.email;
       id = decoded.id;
       const user = this.userService.findByEmail(email);

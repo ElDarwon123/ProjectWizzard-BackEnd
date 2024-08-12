@@ -82,7 +82,7 @@ export class UsuarioController {
     return this.usuarioService.update(id, updateUsuarioDto);
   }
 
-  @Delete()
+  @Delete(':id')
   @ApiBearerAuth('token')
   @ApiResponse({ type: Usuario, status: 200 })
   @ApiParam({ name: 'id', type: 'ObjectId' })
