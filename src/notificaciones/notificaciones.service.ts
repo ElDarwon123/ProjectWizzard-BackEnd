@@ -16,6 +16,7 @@ import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
+import path from 'path';
 
 @Injectable()
 export class NotificacionesService {
@@ -93,7 +94,15 @@ export class NotificacionesService {
   //  When a project is created, the admin gets a notification
   async findAdminNotiProject(): Promise<NotificacionProyecto[]> {
     try {
-      const notis = await this.notiProject.find().exec();
+      const notis = await this.notiProject
+        .find()
+        .populate([
+          {
+            path: 'proyecto',
+            populate: ['usuarioId', 'secciones', 'revisiones'],
+          },
+        ])
+        .exec();
 
       const filteredNotis = notis.filter((noti) => {
         const nota = noti.title;
@@ -102,7 +111,7 @@ export class NotificacionesService {
 
       return filteredNotis;
     } catch (error) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException(error);
     }
   }
 
