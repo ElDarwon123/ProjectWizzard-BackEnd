@@ -9,14 +9,12 @@ import { UpdateNotificacionProyectoDto } from './dto/update-notificacion-proyect
 import { CreateNotiAnnouncementDto } from './dto/create-notificacion.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { NotificacionProyecto } from './schemas/notificacion-proyecto.schema';
-import { Model, Types } from 'mongoose';
+import { Model, Types, IfEquals } from 'mongoose';
 import { NotificacionConvocatoria } from './schemas/notificacion-convocatoria.schema';
 import { UpdateNotiAnnouncementDto } from './dto/update-notificacion-convocatoria.dto';
-import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
-import path from 'path';
 
 @Injectable()
 export class NotificacionesService {
@@ -96,12 +94,10 @@ export class NotificacionesService {
     try {
       const notis = await this.notiProject
         .find()
-        .populate([
-          {
-            path: 'proyecto',
-            populate: ['usuarioId', 'secciones', 'revisiones'],
-          },
-        ])
+        .populate({
+          path: 'proyecto',
+          populate: ['usuarioId', 'secciones', 'revisiones'],
+        })
         .exec();
 
       const filteredNotis = notis.filter((noti) => {
@@ -115,7 +111,7 @@ export class NotificacionesService {
     }
   }
 
-  async findAllNotisProjects(token: any): Promise<NotificacionProyecto[]> {
+  async findAllNotisProjects(token: string): Promise<NotificacionProyecto[]> {
     let user: string;
     try {
       const decoded = this.jwtService.verify(token, {
@@ -127,21 +123,34 @@ export class NotificacionesService {
         .find()
         .populate({
           path: 'proyecto',
-          select: 'usuarioId',
+          select: ['usuarioId', 'revisiones', 'secciones'],
+          populate: [
+            {
+              path: 'usuarioId',
+            },
+            {
+              path: 'revisiones',
+            },
+            {
+              path: 'secciones',
+            },
+          ],
         })
         .exec();
 
       const filteredNotis = notis.filter((noti) => {
         const proyecto = noti.proyecto as Proyecto;
         return (
-          proyecto.usuarioId.toString() === user &&
+          proyecto &&
+          proyecto.usuarioId &&
+          proyecto.usuarioId._id.toString() === user &&
           noti.title !== 'Se ha subido un nuevo proyecto!'
         );
       });
 
       return filteredNotis;
     } catch (error) {
-      throw new UnauthorizedException('Invalid token');
+      console.log(error);
     }
   }
 
