@@ -1,8 +1,12 @@
-import { Prop, SchemaFactory, Schema} from '@nestjs/mongoose';
+import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
 
+export class templateAnnouncement {
+  @ApiProperty({ type: String, example: 'Planteamiento del problema' })
+  titlo: string;
+}
 @Schema()
 export class Convocatoria extends Document {
   @ApiProperty()
@@ -11,7 +15,10 @@ export class Convocatoria extends Document {
     set: (value: string) => new Date(value),
   })
   fechaInicio: Date;
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'Se reciben proyectos orientados a mejorar la economía campesina',
+  })
   @Prop({
     required: true,
     type: String,
@@ -23,12 +30,15 @@ export class Convocatoria extends Document {
     set: (value: string) => new Date(value),
   })
   fechaCierre: Date;
-  @ApiProperty()
+  @ApiProperty({ enum: estadoConvocatoria, examples: estadoConvocatoria })
   @Prop({
     enum: estadoConvocatoria,
     default: estadoConvocatoria.ACTIVE,
   })
   estado: estadoConvocatoria;
+  @ApiProperty({ type: templateAnnouncement, examples: templateAnnouncement })
+  @Prop()
+  plantilla: templateAnnouncement[];
 }
 
 export const convocatoriaSchema = SchemaFactory.createForClass(Convocatoria);

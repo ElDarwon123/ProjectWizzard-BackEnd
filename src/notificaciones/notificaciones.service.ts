@@ -44,7 +44,14 @@ export class NotificacionesService {
   async findAllNotiAnnouncement(): Promise<NotificacionConvocatoria[]> {
     try {
       const notis = await this.notiConv.find().populate('convocatoria');
-      return notis;
+
+      const notisFiltered = notis.filter(async (noti) => {
+        if (noti.convocatoria === null) {
+          await this.notiConv.findByIdAndDelete(noti._id);
+        }
+        return noti && noti.convocatoria;
+      });
+      return notisFiltered;
     } catch (error) {
       throw new NotFoundException(error);
     }
@@ -100,9 +107,14 @@ export class NotificacionesService {
         })
         .exec();
 
-      const filteredNotis = notis.filter((noti) => {
-        const nota = noti.title;
-        return nota === 'Se ha subido un nuevo proyecto!';
+      const filteredNotis = notis.filter(async (noti) => {
+        const note = noti.title;
+        if (noti.proyecto === null) {
+          await this.notiProject.findByIdAndDelete(noti._id);
+        }
+        return (
+          noti.proyecto !== null && note === 'Se ha subido un nuevo proyecto!'
+        );
       });
 
       return filteredNotis;
@@ -138,8 +150,11 @@ export class NotificacionesService {
         })
         .exec();
 
-      const filteredNotis = notis.filter((noti) => {
+      const filteredNotis = notis.filter(async (noti) => {
         const proyecto = noti.proyecto as Proyecto;
+        if (noti.proyecto === null) {
+          await this.notiProject.findByIdAndDelete(noti._id)
+        }
         return (
           proyecto &&
           proyecto.usuarioId &&

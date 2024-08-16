@@ -1,6 +1,15 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsEnum, IsNotEmpty, IsString, IsStrongPassword } from "class-validator";
-import { estadoConvocatoria } from "src/enums/convocatoria.enum";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+  IsArray,
+  IsOptional,
+} from 'class-validator';
+import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
+import { templateAnnouncement } from '../schemas/convocatoria.entity';
 
 export class CreateConvocatoriaDto {
   @ApiProperty()
@@ -22,4 +31,9 @@ export class CreateConvocatoriaDto {
   @IsNotEmpty()
   @IsEnum(estadoConvocatoria)
   estado: estadoConvocatoria;
+
+  @ApiProperty({ type: templateAnnouncement, example: templateAnnouncement })
+  @IsOptional()
+  @IsArray()
+  plantilla: templateAnnouncement[];
 }
