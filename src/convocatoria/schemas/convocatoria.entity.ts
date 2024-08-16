@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
 
-export class templateAnnouncement {
+export class AnnouncementTemplate {
   @ApiProperty({ type: String, example: 'Planteamiento del problema' })
   titlo: string;
 }
@@ -36,9 +36,9 @@ export class Convocatoria extends Document {
     default: estadoConvocatoria.ACTIVE,
   })
   estado: estadoConvocatoria;
-  @ApiProperty({ type: templateAnnouncement, examples: templateAnnouncement })
+  @ApiProperty({ type: AnnouncementTemplate, examples: AnnouncementTemplate })
   @Prop()
-  plantilla: templateAnnouncement[];
+  plantilla: AnnouncementTemplate[];
 }
 
 export const convocatoriaSchema = SchemaFactory.createForClass(Convocatoria);

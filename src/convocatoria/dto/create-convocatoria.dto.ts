@@ -9,7 +9,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
-import { templateAnnouncement } from '../schemas/convocatoria.entity';
+import { AnnouncementTemplate } from '../schemas/convocatoria.entity';
 
 export class CreateConvocatoriaDto {
   @ApiProperty()
@@ -32,8 +32,8 @@ export class CreateConvocatoriaDto {
   @IsEnum(estadoConvocatoria)
   estado: estadoConvocatoria;
 
-  @ApiProperty({ type: templateAnnouncement, example: templateAnnouncement })
+  @ApiProperty({ type: AnnouncementTemplate, example: AnnouncementTemplate })
   @IsOptional()
   @IsArray()
-  plantilla: templateAnnouncement[];
+  plantilla: AnnouncementTemplate[];
 }
