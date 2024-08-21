@@ -42,6 +42,27 @@ export class ProyectoService {
       .populate(['usuarioId', 'secciones', 'revisiones'])
       .exec();
   }
+  // == GET USER PROJECTS ==
+  async findUserProjects(token: string): Promise<Proyecto[]> {
+    let user: string;
+    try {
+      const decoded = await this.jwtService.decode(token);
+      user = decoded.sub._id;
+
+      const projects = await this.proyectoModel
+        .find()
+        .populate(['usuarioId', 'secciones', 'revisiones'])
+        .exec();
+
+      const filteredProjects = projects.filter((project) => {
+        return project.usuarioId && project.usuarioId._id.toString() === user;
+      });
+
+      return filteredProjects;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
 
   async findActives(token: string): Promise<Proyecto[]> {
     let user: string;
@@ -182,7 +203,7 @@ export class ProyectoService {
       body,
       proyecto: proyecto.id,
       url,
-      estado: notiStateEnum.NonViwed
+      estado: notiStateEnum.NonViwed,
     });
 
     return proyecto;

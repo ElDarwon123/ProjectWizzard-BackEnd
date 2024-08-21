@@ -96,6 +96,16 @@ export class ProyectoController {
     return this.proyectoService.findActives(token);
   }
 
+  @Get('mis-proyectos')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
+  @Roles(RolesEnum.Admin, RolesEnum.Aprendiz)
+  @UseGuards(AuthGuard, RolesGuard)
+  getUserProjects(@Request() req: Requ): Promise<Proyecto[]>{
+    const token = req.headers.authorization.split(' ')[1];
+    return this.proyectoService.findUserProjects(token);
+  }
+
   @Get('percents')
   getPercents() {
     return this.proyectoService.getProjectsByState('percents');

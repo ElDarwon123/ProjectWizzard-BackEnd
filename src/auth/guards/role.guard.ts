@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
 
       if (!roles) return true;
 
-      console.log('rol: ' + roles);
+
 
       const request = context.switchToHttp().getRequest();
       let { user } = request;
@@ -32,8 +32,7 @@ export class RolesGuard implements CanActivate {
         user = await user;
       }
 
-      console.log('Roles esperados:', roles);
-      console.log('Role del usuario:', user.role);
+
 
       return roles.includes(user.role);
     } catch (error) {
