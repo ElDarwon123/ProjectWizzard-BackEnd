@@ -5,16 +5,27 @@ import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
 
 export class AnnouncementTemplate {
   @ApiProperty({ type: String, example: 'Planteamiento del problema' })
-  titlo: string;
+  title: string[];
 }
 @Schema()
 export class Convocatoria extends Document {
-  @ApiProperty()
+  @ApiProperty({ type: Date, example: '2025-06-2015' })
   @Prop({
     required: true,
     set: (value: string) => new Date(value),
   })
   fechaInicio: Date;
+
+  @ApiProperty({
+    type: String,
+    example: 'Proyectos sobre el campo colombiano',
+  })
+  @Prop({
+    required: true,
+    type: String,
+  })
+  title: string;
+
   @ApiProperty({
     type: String,
     example: 'Se reciben proyectos orientados a mejorar la economía campesina',
@@ -24,6 +35,7 @@ export class Convocatoria extends Document {
     type: String,
   })
   descripcion: string;
+
   @ApiProperty()
   @Prop({
     required: true,
@@ -38,7 +50,7 @@ export class Convocatoria extends Document {
   estado: estadoConvocatoria;
   @ApiProperty({ type: AnnouncementTemplate, examples: AnnouncementTemplate })
   @Prop()
-  plantilla: AnnouncementTemplate[];
+  template: AnnouncementTemplate[];
 }
 
 export const convocatoriaSchema = SchemaFactory.createForClass(Convocatoria);

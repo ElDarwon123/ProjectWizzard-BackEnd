@@ -18,6 +18,11 @@ export class CreateConvocatoriaDto {
   fechaInicio: Date;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+  
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   descripcion: string;
