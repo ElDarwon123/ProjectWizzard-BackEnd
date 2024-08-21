@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { Types } from 'mongoose';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
 
-@Schema()
+@Schema({ timestamps: true })
 export class NotificacionConvocatoria {
   @ApiProperty()
   @Prop()

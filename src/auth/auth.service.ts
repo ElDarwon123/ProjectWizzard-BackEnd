@@ -39,9 +39,7 @@ export class AuthService {
       }
 
       const isMatch = await bcrypt.compare(pass, user.contrasena);
-      console.log(pass);
 
-      console.log(user.contrasena);
 
       if (!isMatch) {
         throw new UnauthorizedException('Invalid Credentials');

@@ -116,7 +116,8 @@ export class NotificacionesService {
           noti.proyecto !== null && note === 'Se ha subido un nuevo proyecto!'
         );
       });
-
+      console.log(filteredNotis.length);
+      
       return filteredNotis;
     } catch (error) {
       throw new UnauthorizedException(error);
@@ -150,19 +151,19 @@ export class NotificacionesService {
         })
         .exec();
 
-      const filteredNotis = notis.filter(async (noti) => {
-        const proyecto = noti.proyecto as Proyecto;
-        if (noti.proyecto === null) {
-          await this.notiProject.findByIdAndDelete(noti._id)
+      const filteredNotis = notis.filter( (noti) => {
+        const proyecto = noti.proyecto;
+        if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
+          this.notiProject.findByIdAndDelete(noti._id)
         }
         return (
-          proyecto &&
           proyecto.usuarioId &&
           proyecto.usuarioId._id.toString() === user &&
           noti.title !== 'Se ha subido un nuevo proyecto!'
         );
       });
 
+      
       return filteredNotis;
     } catch (error) {
       console.log(error);
