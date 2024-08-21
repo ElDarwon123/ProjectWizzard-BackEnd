@@ -91,7 +91,6 @@ export class UsuarioService {
     try {
       const user = await this.usuarioModel
         .findOne({ email: email })
-        .select('nombre apellido email numIdentificacion telefono ')
         .exec();
       return user
     } catch (error) {
