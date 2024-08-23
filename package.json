@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "node --max_old_space_size=2048 -r ts-node/register -r tsconfig-paths/register src/main.ts",
+    "start": "node --max_old_space_size=100000 -r ts-node/register -r tsconfig-paths/register src/main.ts",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node --max_old_space_size=2048 dist/main",

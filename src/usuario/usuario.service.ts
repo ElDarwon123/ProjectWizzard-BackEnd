@@ -87,10 +87,11 @@ export class UsuarioService {
     }
   }
 
-  async findByEmail(email: string) {
+  async findUserForToken(email: string) {
     try {
       const user = await this.usuarioModel
         .findOne({ email: email })
+        .select(['nombre', 'email', 'fechaNacimiento', 'contrasena'])
         .exec();
       return user
     } catch (error) {

@@ -198,7 +198,7 @@ export class NotificacionesService {
       const delNoti = await this.notiProject.findByIdAndDelete(id);
       return delNoti;
     } catch (error) {
-      throw new UnauthorizedException('Invalid token');
+      throw new NotFoundException('Noti not found');
     }
   }
 }

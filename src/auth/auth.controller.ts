@@ -13,14 +13,12 @@ import {
   Patch,
   Param,
 } from '@nestjs/common';
-//import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request as Requ, Response as Res } from 'express';
 import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
-import { CreateUsuarioDto } from 'src/usuario/dto/create-usuario.dto';
 import { sendEmail } from './dto/send-email.dto';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
 import { CreateBlackList } from './dto/create-blackList.dto';
@@ -44,9 +42,11 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiResponse({ type: Usuario, status: 200 })
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@Request() req: Requ) {
+    const token = req.headers.authorization.split(' ')[1];
+    return this.authService.profile(token)
   }
+
   @Post('logout')
   @ApiBody({ type: CreateBlackList })
   @ApiResponse({ type: 'Logout successful', status: 200 })
