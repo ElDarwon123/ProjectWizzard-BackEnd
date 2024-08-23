@@ -103,7 +103,11 @@ export class NotificacionesService {
         .find()
         .populate({
           path: 'proyecto',
-          populate: ['usuarioId', 'secciones', 'revisiones'],
+          select: ['titulo', 'usuarioId'],
+          populate: {
+            path: 'usuarioId',
+            select: ['nombre', 'apellido']
+          }
         })
         .exec();
 
@@ -116,7 +120,6 @@ export class NotificacionesService {
           noti.proyecto !== null && note === 'Se ha subido un nuevo proyecto!'
         );
       });
-      console.log(filteredNotis.length);
       
       return filteredNotis;
     } catch (error) {
@@ -131,23 +134,13 @@ export class NotificacionesService {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
       user = decoded.sub._id;
-
+      console.log(user);
+      
       const notis = await this.notiProject
         .find()
         .populate({
           path: 'proyecto',
-          select: ['usuarioId', 'revisiones', 'secciones'],
-          populate: [
-            {
-              path: 'usuarioId',
-            },
-            {
-              path: 'revisiones',
-            },
-            {
-              path: 'secciones',
-            },
-          ],
+          select: ['title', 'usuarioId'],
         })
         .exec();
 
@@ -157,6 +150,7 @@ export class NotificacionesService {
           this.notiProject.findByIdAndDelete(noti._id)
         }
         return (
+          proyecto &&
           proyecto.usuarioId &&
           proyecto.usuarioId._id.toString() === user &&
           noti.title !== 'Se ha subido un nuevo proyecto!'
@@ -166,7 +160,13 @@ export class NotificacionesService {
       
       return filteredNotis;
     } catch (error) {
-      console.log(error);
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      } else {
+        throw new UnauthorizedException('Unauthorized access');
+      }
     }
   }
 

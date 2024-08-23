@@ -43,7 +43,7 @@ export class ProyectoController {
   @ApiBody({ type: CreateProyectoDto })
   @ApiResponse({ type: Proyecto, status: 200 })
   @ApiBearerAuth('token')
-  @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
+  @Roles(RolesEnum.Aprendiz)
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
   create(

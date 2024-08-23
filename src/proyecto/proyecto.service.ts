@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
@@ -53,11 +54,12 @@ export class ProyectoService {
         .find()
         .populate(['usuarioId', 'secciones', 'revisiones'])
         .exec();
-
+      
       const filteredProjects = projects.filter((project) => {
         return project.usuarioId && project.usuarioId._id.toString() === user;
       });
-
+      console.log(filteredProjects);
+      
       return filteredProjects;
     } catch (error) {
       throw new NotFoundException(error.message);
@@ -82,7 +84,13 @@ export class ProyectoService {
       });
       return filtered;
     } catch (error) {
-      throw new NotFoundException(error.message);
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      } else {
+        throw new UnauthorizedException('Unauthorized access');
+      }
     }
   }
 
@@ -196,7 +204,7 @@ export class ProyectoService {
 
     const title = 'Se ha subido un nuevo proyecto!';
     const body = 'Ha llegado un nuevo proyecto al gremio, vamos a revisarlo!';
-    const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/proyectos/${proyecto.id}`;
+    const url = proyecto.id;
 
     await this.notiService.createNotiProject({
       title,

@@ -12,9 +12,6 @@ export class NotificacionConvocatoria {
   @Prop()
   body: string;
   @ApiProperty()
-  @Prop()
-  url: string;
-  @ApiProperty()
   @Prop({ enum: notiStateEnum, default: notiStateEnum.NonViwed })
   estado: notiStateEnum.NonViwed;
   @ApiProperty()

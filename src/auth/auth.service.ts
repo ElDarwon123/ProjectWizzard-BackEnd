@@ -33,14 +33,12 @@ export class AuthService {
     try {
       let user: string;
       const decoded = this.jwtService.decode(token);
-      console.log(decoded);
-
       user = decoded.sub._id;
       console.log(user);
       const currentUser = await this.userService.findOne(user);
       console.log(currentUser);
 
-      return currentUser;
+      return {sub: currentUser};
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token has expired');

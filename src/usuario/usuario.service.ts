@@ -91,7 +91,7 @@ export class UsuarioService {
     try {
       const user = await this.usuarioModel
         .findOne({ email: email })
-        .select(['nombre', 'email', 'fechaNacimiento', 'contrasena'])
+        .select(['nombre', 'email', 'fechaNacimiento', 'contrasena', 'role'])
         .exec();
       return user
     } catch (error) {
