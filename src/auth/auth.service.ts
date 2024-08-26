@@ -38,7 +38,7 @@ export class AuthService {
       const currentUser = await this.userService.findOne(user);
       console.log(currentUser);
 
-      return {sub: currentUser};
+      return {sub:currentUser};
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token has expired');

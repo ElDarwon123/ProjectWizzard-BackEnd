@@ -113,7 +113,10 @@ export class NotificacionesService {
 
       const filteredNotis = notis.filter(async (noti) => {
         const note = noti.title;
-        if (noti.proyecto === null) {
+        if (
+          noti.proyecto === null ||
+          noti.title !== 'Se ha subido un nuevo proyecto!'
+        ) {
           await this.notiProject.findByIdAndDelete(noti._id);
         }
         return (
