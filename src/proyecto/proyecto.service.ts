@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, Types } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Proyecto } from './schema/proyecto.shema';
 import { CreateProyectoDto } from './dtos/create.proyecto.dto';
 import { UpdateProyectoDto } from './dtos/update-proyecto.dto';
@@ -18,7 +18,6 @@ import { EstadoProyecto } from 'src/enums/estado-proyecto.enum';
 import { AuthService } from 'src/auth/auth.service';
 import { forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Usuario } from 'src/usuario/schema/usuario.schema';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
 
 @Injectable()
@@ -38,10 +37,18 @@ export class ProyectoService {
 
   // == GET ALL METHOD ==
   async findAll(): Promise<Proyecto[]> {
-    return this.proyectoModel
+    const projects = await this.proyectoModel
       .find()
       .populate(['usuarioId', 'secciones', 'revisiones'])
       .exec();
+    
+    const filteredProj = projects.filter(async (proj) => {
+      if (proj.usuarioId === null) {
+        await this.proyectoModel.findByIdAndDelete(proj._id);
+      }
+      return (proj && proj.usuarioId !== null)
+    });
+    return filteredProj;
   }
   // == GET USER PROJECTS ==
   async findUserProjects(token: string): Promise<Proyecto[]> {

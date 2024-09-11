@@ -45,12 +45,14 @@ export class NotificacionesService {
     try {
       const notis = await this.notiConv.find().populate('convocatoria');
 
-      const notisFiltered = notis.filter(async (noti) => {
-        if (noti.convocatoria === null) {
-          await this.notiConv.findByIdAndDelete(noti._id);
-        }
-        return noti && noti.convocatoria;
-      });
+      const notisFiltered = Promise.all(
+        notis.filter(async (noti) => {
+          if (noti.convocatoria === null) {
+            await this.notiConv.findByIdAndDelete(noti._id);
+          }
+          return noti && noti.convocatoria;
+        })
+      );
       return notisFiltered;
     } catch (error) {
       throw new NotFoundException(error);
@@ -111,18 +113,20 @@ export class NotificacionesService {
         })
         .exec();
 
-      const filteredNotis = notis.filter(async (noti) => {
-        const note = noti.title;
-        if (
-          noti.proyecto === null ||
-          noti.title !== 'Se ha subido un nuevo proyecto!'
-        ) {
-          await this.notiProject.findByIdAndDelete(noti._id);
-        }
-        return (
-          noti.proyecto !== null && note === 'Se ha subido un nuevo proyecto!'
-        );
-      });
+      const filteredNotis = Promise.all(
+        notis.filter(async (noti) => {
+          const note = noti.title;
+          if (
+            noti.proyecto === null ||
+            noti.title !== 'Se ha subido un nuevo proyecto!'
+          ) {
+            await this.notiProject.findByIdAndDelete(noti._id);
+          }
+          return (
+            noti.proyecto !== null && note === 'Se ha subido un nuevo proyecto!'
+          );
+        }),
+      );
       
       return filteredNotis;
     } catch (error) {
@@ -147,18 +151,20 @@ export class NotificacionesService {
         })
         .exec();
 
-      const filteredNotis = notis.filter( (noti) => {
-        const proyecto = noti.proyecto;
-        if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
-          this.notiProject.findByIdAndDelete(noti._id)
-        }
-        return (
-          proyecto &&
-          proyecto.usuarioId &&
-          proyecto.usuarioId._id.toString() === user &&
-          noti.title !== 'Se ha subido un nuevo proyecto!'
-        );
-      });
+      const filteredNotis = Promise.all(
+        notis.filter((noti) => {
+          const proyecto = noti.proyecto;
+          if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
+            this.notiProject.findByIdAndDelete(noti._id);
+          }
+          return (
+            proyecto &&
+            proyecto.usuarioId &&
+            proyecto.usuarioId._id.toString() === user &&
+            noti.title !== 'Se ha subido un nuevo proyecto!'
+          );
+        }),
+      );
 
       
       return filteredNotis;

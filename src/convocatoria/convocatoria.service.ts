@@ -12,6 +12,7 @@ import { FirebaseService } from 'src/firebase/firebase.service';
 import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
 import { ConfigService } from '@nestjs/config';
+import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
 
 @Injectable()
 export class ConvocatoriaService {
@@ -21,17 +22,14 @@ export class ConvocatoriaService {
     private readonly firebaseService: FirebaseService,
     private readonly notisService: NotificacionesService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async create(
     createConvocatoriaDto: CreateConvocatoriaDto,
-    file: Express.Multer.File[]
+    file: Express.Multer.File[],
   ): Promise<Convocatoria> {
-
-
     try {
       const newCon = new this.convocatoriaModel(createConvocatoriaDto);
-
 
       const fileUploads = file.map(async (file) => {
         const fileBuffer = file.buffer;
@@ -43,14 +41,15 @@ export class ConvocatoriaService {
         await this.firebaseService.uploadFile(
           fileBuffer,
           fileDestination,
-          fileMymeType,);
+          fileMymeType,
+        );
 
-        const filesUrls = []
+        const filesUrls = [];
         const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(fileDestination)}?alt=media`;
         filesUrls.push(fileUrl);
         newCon.files.push(fileUrl);
-        return newCon.save()
-      })
+        return newCon.save();
+      });
 
       //  Notification body
       const title = 'Nueva convocatoria!';
@@ -59,9 +58,9 @@ export class ConvocatoriaService {
         title,
         body,
         convocatoria: newCon.id,
-        estado: notiStateEnum.NonViwed
+        estado: notiStateEnum.NonViwed,
       });
-      await Promise.all(fileUploads)
+      await Promise.all(fileUploads);
       return newCon;
     } catch (error) {
       throw new BadRequestException(error);
@@ -70,7 +69,13 @@ export class ConvocatoriaService {
 
   async findAll(): Promise<Convocatoria[]> {
     try {
+      const now = new Date();
+
       const convs = await this.convocatoriaModel.find();
+      await Promise.allSettled(
+        convs.map((conv) => this.announcementFinished(conv.id, now)),
+      );
+
       return convs;
     } catch (error) {
       throw new NotFoundException('Announcement not found');
@@ -79,7 +84,10 @@ export class ConvocatoriaService {
 
   async findOne(id: Types.ObjectId) {
     try {
+      const now = new Date();
+
       const conv = await this.convocatoriaModel.findById(id);
+      await this.announcementFinished(conv.id, now);
       return conv;
     } catch (error) {
       throw new NotFoundException('Announcement not found');
@@ -99,6 +107,26 @@ export class ConvocatoriaService {
       return conv;
     } catch (error) {
       throw new BadRequestException('Invalid id or body');
+    }
+  }
+
+  async announcementFinished(id: Types.ObjectId, now: Date) {
+    try {
+      const announcement = await this.convocatoriaModel.findByIdAndUpdate(id);
+
+      if (!announcement) {
+        throw new NotFoundException('Announcement not found');
+      }
+
+      if (now >= announcement.fechaCierre) {
+        announcement.estado = estadoConvocatoria.FINALIZED;
+        await announcement.save();
+        return {
+          message: `Convocatoria ${announcement.title} ha sido finalizada`,
+        };
+      }
+    } catch (error) {
+      throw new BadRequestException(error);
     }
   }
 
