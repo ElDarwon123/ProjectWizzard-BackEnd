@@ -21,7 +21,7 @@ export class CreateConvocatoriaDto {
   @IsString()
   @IsNotEmpty()
   title: string;
-  
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -36,6 +36,11 @@ export class CreateConvocatoriaDto {
   @IsNotEmpty()
   @IsEnum(estadoConvocatoria)
   estado: estadoConvocatoria;
+
+  @ApiProperty({ example: 'Insertar un archivo que contenga información sobre la convocatoria' })
+  @IsArray()
+  @IsOptional()
+  files?: string[];
 
   @ApiProperty({ type: AnnouncementTemplate, example: AnnouncementTemplate })
   @IsOptional()

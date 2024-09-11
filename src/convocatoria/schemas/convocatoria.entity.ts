@@ -48,6 +48,11 @@ export class Convocatoria extends Document {
     default: estadoConvocatoria.ACTIVE,
   })
   estado: estadoConvocatoria;
+
+  @ApiProperty({example: 'Insertar un archivo que contenga información sobre la convocatoria'})
+  @Prop({ type: [String], required: false })
+  files?: String[];
+
   @ApiProperty({ type: AnnouncementTemplate, examples: AnnouncementTemplate })
   @Prop()
   template: AnnouncementTemplate[];

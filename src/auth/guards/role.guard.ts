@@ -29,8 +29,6 @@ export class RolesGuard implements CanActivate {
         user = await user;
       }
 
-
-
       return roles.includes(user.role);
     } catch (error) {
       throw new UnauthorizedException('Invalid role');

@@ -9,9 +9,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Convocatoria } from './schemas/convocatoria.entity';
 import { Model, Types } from 'mongoose';
 import { FirebaseService } from 'src/firebase/firebase.service';
-import { Request } from 'express';
 import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConvocatoriaService {
@@ -20,13 +20,39 @@ export class ConvocatoriaService {
     private readonly convocatoriaModel: Model<Convocatoria>,
     private readonly firebaseService: FirebaseService,
     private readonly notisService: NotificacionesService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) { }
 
-  async create(createConvocatoriaDto: CreateConvocatoriaDto) {
+  async create(
+    createConvocatoriaDto: CreateConvocatoriaDto,
+    file: Express.Multer.File[]
+  ): Promise<Convocatoria> {
+
+
     try {
       const newCon = new this.convocatoriaModel(createConvocatoriaDto);
-      await newCon.save();
 
+
+      const fileUploads = file.map(async (file) => {
+        const fileBuffer = file.buffer;
+        const fileDestination = `convocatoria/${newCon._id}/${file.originalname}`;
+        const fileMymeType = file.mimetype;
+        if (!fileBuffer && !fileDestination && !fileMymeType) {
+          throw new BadRequestException('Invalid file upload');
+        }
+        await this.firebaseService.uploadFile(
+          fileBuffer,
+          fileDestination,
+          fileMymeType,);
+
+        const filesUrls = []
+        const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(fileDestination)}?alt=media`;
+        filesUrls.push(fileUrl);
+        newCon.files.push(fileUrl);
+        return newCon.save()
+      })
+
+      //  Notification body
       const title = 'Nueva convocatoria!';
       const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
       this.notisService.createNotiAnnouncement({
@@ -35,9 +61,10 @@ export class ConvocatoriaService {
         convocatoria: newCon.id,
         estado: notiStateEnum.NonViwed
       });
+      await Promise.all(fileUploads)
       return newCon;
     } catch (error) {
-      throw new BadRequestException();
+      throw new BadRequestException(error);
     }
   }
 

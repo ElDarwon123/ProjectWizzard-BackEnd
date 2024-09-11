@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsStrongPassword,
 } from 'class-validator';
 import { RolesEnum } from 'src/enums/role.enum';
 
@@ -47,6 +48,7 @@ export class CreateUsuarioDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @IsStrongPassword({minLength: 8})
   contrasena: string;
 
   @ApiProperty({ enum: RolesEnum })

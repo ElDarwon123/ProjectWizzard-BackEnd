@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,

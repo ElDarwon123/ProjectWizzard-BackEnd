@@ -6,6 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
+  UseGuards,
 } from '@nestjs/common';
 import { ConvocatoriaService } from './convocatoria.service';
 import { CreateConvocatoriaDto } from './dto/create-convocatoria.dto';
@@ -13,18 +16,31 @@ import { UpdateConvocatoriaDto } from './dto/update-convocatoria.dto';
 import { Types } from 'mongoose';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Convocatoria } from './schemas/convocatoria.entity';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesEnum } from 'src/enums/role.enum';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @ApiTags('Convocatoria')
 @Controller('convocatoria')
 export class ConvocatoriaController {
-  constructor(private readonly convocatoriaService: ConvocatoriaService) {}
+  constructor(private readonly convocatoriaService: ConvocatoriaService) { }
 
-  @ApiBody({ type: CreateConvocatoriaDto })
+  @ApiBody({ type: CreateConvocatoriaDto, description: "For the 'file' property, needs an FIle input, it receives an file and save a file firebase url" })
   @ApiResponse({ type: Convocatoria, status: 201 })
+  @UseInterceptors(FilesInterceptor('files'))
+  @Roles(RolesEnum.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Post()
-  create(@Body() createConvocatoriaDto: CreateConvocatoriaDto) {
-    return this.convocatoriaService.create(createConvocatoriaDto);
+  create(
+    @Body() createConvocatoriaDto: CreateConvocatoriaDto,
+    @UploadedFiles() file: Express.Multer.File[]
+  ): Promise<Convocatoria> {
+    return this.convocatoriaService.create(createConvocatoriaDto, file);
   }
+
   @ApiResponse({ type: Convocatoria, status: 200 })
   @Get()
   findAll() {

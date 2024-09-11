@@ -201,7 +201,8 @@ export class ProyectoService {
       createProyectoDto.usuarioId,
       proyecto.id,
     );
-
+    
+    // notification body
     const title = 'Se ha subido un nuevo proyecto!';
     const body = 'Ha llegado un nuevo proyecto al gremio, vamos a revisarlo!';
     const url = proyecto.id;
