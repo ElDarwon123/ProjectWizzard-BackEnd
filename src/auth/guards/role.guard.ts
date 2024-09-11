@@ -32,8 +32,6 @@ export class RolesGuard implements CanActivate {
         user = await user;
       }
 
-      console.log('Roles esperados:', roles);
-      console.log('Role del usuario:', user.role);
 
       return roles.includes(user.role);
     } catch (error) {

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsEnum, IsNotEmpty, IsString, IsStrongPassword } from "class-validator";
+import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from "class-validator";
 import { estadoConvocatoria } from "src/enums/convocatoria.enum";
 
 export class CreateConvocatoriaDto {
@@ -22,4 +22,9 @@ export class CreateConvocatoriaDto {
   @IsNotEmpty()
   @IsEnum(estadoConvocatoria)
   estado: estadoConvocatoria;
+
+  @ApiProperty({example: 'Insertar un archivo que contenga información sobre la convocatoria'})
+  @IsString()
+  @IsOptional()
+  files?: string[];
 }

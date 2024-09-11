@@ -70,7 +70,6 @@ export class ProyectoController {
     @Param('id') projectId: ObjectId,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    console.log(files);
     await this.proyectoService.addFileToProject(projectId, files);
     return { message: 'Files added successfully' };
   }

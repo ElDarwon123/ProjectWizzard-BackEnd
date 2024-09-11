@@ -39,9 +39,6 @@ export class AuthService {
       }
 
       const isMatch = await bcrypt.compare(pass, user.contrasena);
-      console.log(pass);
-
-      console.log(user.contrasena);
 
       if (!isMatch) {
         throw new UnauthorizedException('Invalid Credentials');
@@ -76,7 +73,6 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    console.log(user);
 
     const token = await this.jwtService.signAsync(
       { email: user.email, id: user._id },
@@ -137,7 +133,6 @@ export class AuthService {
     } else if (!proj) {
       throw new NotFoundException('Project not found');
     }
-    console.log(user);
 
     const token = await this.jwtService.signAsync(
       { email: user.email, id: user._id },

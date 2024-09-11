@@ -93,7 +93,7 @@ export class NotificacionesService {
   //  When a project is created, the admin gets a notification
   async findAdminNotiProject(): Promise<NotificacionProyecto[]> {
     try {
-      const notis = await this.notiProject.find().exec();
+      const notis = await this.notiProject.find().populate('proyecto').exec();
 
       const filteredNotis = notis.filter((noti) => {
         const nota = noti.title;

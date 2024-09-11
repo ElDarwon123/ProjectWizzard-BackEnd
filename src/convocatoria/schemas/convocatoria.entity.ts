@@ -29,6 +29,9 @@ export class Convocatoria extends Document {
     default: estadoConvocatoria.ACTIVE,
   })
   estado: estadoConvocatoria;
+  @ApiProperty()
+  @Prop({ type: [String] })
+  files: String[];
 }
 
 export const convocatoriaSchema = SchemaFactory.createForClass(Convocatoria);
