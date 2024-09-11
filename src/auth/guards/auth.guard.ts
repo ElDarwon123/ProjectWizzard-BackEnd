@@ -2,14 +2,12 @@
 import {
   BadRequestException,
   CanActivate,
-  ConflictException,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -41,11 +39,14 @@ export class AuthGuard implements CanActivate {
       }
       request['user'] = payLoad;
       return true;
-    } catch (err) {
-      if (err instanceof TokenExpiredError) {
-        throw new TokenExpiredError("Token Expired", new Date());
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      } else {
+        throw new UnauthorizedException('Unauthorized access');
       }
-      throw new BadRequestException(err)
     }
   }
 
@@ -58,10 +59,13 @@ export class AuthGuard implements CanActivate {
       const [type, token] = authHeader.split(' ');
       return type === 'Bearer' ? token : undefined;
     } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        throw new TokenExpiredError('Token Expired', new Date());
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      } else {
+        throw new UnauthorizedException('Unauthorized access');
       }
-      throw new ConflictException(error);
     }
   }
 }

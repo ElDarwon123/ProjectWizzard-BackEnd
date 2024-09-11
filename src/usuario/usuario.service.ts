@@ -87,9 +87,13 @@ export class UsuarioService {
     }
   }
 
-  async findByEmail(email: string) {
+  async findUserForToken(email: string) {
     try {
-      return this.usuarioModel.findOne({ email }).populate('proyectos').exec();
+      const user = await this.usuarioModel
+        .findOne({ email: email })
+        .select(['nombre', 'email', 'fechaNacimiento', 'contrasena', 'role'])
+        .exec();
+      return user
     } catch (error) {
       throw new NotFoundException('User not found');
     }

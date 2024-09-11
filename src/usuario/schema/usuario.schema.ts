@@ -58,9 +58,7 @@ export class Usuario extends Document {
   @Prop({ type: String })
   image?: string;
 
-  @ApiProperty()
-  @Prop({ type: String })
-  fcmToken?: string;
+  
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

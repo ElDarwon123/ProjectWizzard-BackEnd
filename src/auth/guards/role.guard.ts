@@ -22,16 +22,12 @@ export class RolesGuard implements CanActivate {
 
       if (!roles) return true;
 
-      console.log('rol: ' + roles);
-
       const request = context.switchToHttp().getRequest();
       let { user } = request;
 
-      // espera y cumple la promesa, sin esto, no funciona
       if (user instanceof Promise) {
         user = await user;
       }
-
 
       return roles.includes(user.role);
     } catch (error) {

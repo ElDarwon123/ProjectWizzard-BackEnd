@@ -21,17 +21,18 @@ import { Multer } from 'multer';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesEnum } from 'src/enums/role.enum';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @ApiTags('Convocatoria')
 @Controller('convocatoria')
 export class ConvocatoriaController {
   constructor(private readonly convocatoriaService: ConvocatoriaService) { }
 
-  @ApiBody({ type: CreateConvocatoriaDto })
+  @ApiBody({ type: CreateConvocatoriaDto, description: "For the 'file' property, needs an FIle input, it receives an file and save a file firebase url" })
   @ApiResponse({ type: Convocatoria, status: 201 })
   @UseInterceptors(FilesInterceptor('files'))
   @Roles(RolesEnum.Admin)
-  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Post()
   create(
     @Body() createConvocatoriaDto: CreateConvocatoriaDto,

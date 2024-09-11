@@ -43,7 +43,7 @@ export class ProyectoController {
   @ApiBody({ type: CreateProyectoDto })
   @ApiResponse({ type: Proyecto, status: 200 })
   @ApiBearerAuth('token')
-  @Roles(RolesEnum.Aprendiz, RolesEnum.Admin)
+  @Roles(RolesEnum.Aprendiz)
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
   create(
@@ -93,6 +93,16 @@ export class ProyectoController {
   getActives(@Request() req: Requ): Promise<Proyecto[]> {
     const token = req.headers.authorization.split(' ')[1];
     return this.proyectoService.findActives(token);
+  }
+
+  @Get('mis-proyectos')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Proyecto, status: 200 })
+  @Roles(RolesEnum.Admin, RolesEnum.Aprendiz)
+  @UseGuards(AuthGuard, RolesGuard)
+  getUserProjects(@Request() req: Requ): Promise<Proyecto[]>{
+    const token = req.headers.authorization.split(' ')[1];
+    return this.proyectoService.findUserProjects(token);
   }
 
   @Get('percents')
