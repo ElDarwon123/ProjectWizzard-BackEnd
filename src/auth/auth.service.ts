@@ -34,9 +34,8 @@ export class AuthService {
       let user: string;
       const decoded = this.jwtService.decode(token);
       user = decoded.sub._id;
-      console.log(user);
       const currentUser = await this.userService.findOne(user);
-      console.log(currentUser);
+
 
       return {sub:currentUser};
     } catch (error) {

@@ -10,6 +10,7 @@ import {
   NotFoundException,
   UseInterceptors,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -23,6 +24,7 @@ import { ObjectId, Types } from 'mongoose';
 import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Usuario } from './schema/usuario.schema';
+import { Request as Req } from 'express';
 
 @ApiTags('Usuario')
 @Controller('auth/usuario')
@@ -67,6 +69,15 @@ export class UsuarioController {
     return this.usuarioService.HowManyUsers()
   }
 
+  @Get('counter/projects')
+  @ApiBearerAuth('token')
+  @ApiResponse({ type: Number, status: 200 })
+  @Roles(RolesEnum.Aprendiz)
+  @UseGuards(AuthGuard, RolesGuard)
+  howManyProjects(@Request() req: Req ) {
+    const token = req.headers.authorization.split(' ')[1];
+    return this.usuarioService.howManyProjects(token)
+  }
   @Get(':id')
   @ApiBearerAuth('token')
   @ApiResponse({ type: Usuario, status: 200 })

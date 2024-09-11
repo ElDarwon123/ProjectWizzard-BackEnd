@@ -13,6 +13,7 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsuarioService {
@@ -20,6 +21,7 @@ export class UsuarioService {
     @InjectModel(Usuario.name) private readonly usuarioModel: Model<Usuario>,
     @Inject() private readonly configService: ConfigService,
     private readonly firebaseService: FirebaseService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(
@@ -47,6 +49,28 @@ export class UsuarioService {
       const newUser = new this.usuarioModel(createUsuarioDto);
       await newUser.save();
       return newUser;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async howManyProjects(token: string) {
+    try {
+      const decoded = await this.jwtService.decode(token);
+      const userId = decoded.sub._id;
+
+      if (!decoded) {
+        throw new BadRequestException('Invalid token');
+      }
+      if (!userId) {
+        throw new NotFoundException('User not found');
+      }
+
+      const user = await this.usuarioModel.findById(userId);
+      const cantidad = user.proyectos.length
+      
+      return cantidad
+
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -101,7 +125,7 @@ export class UsuarioService {
 
   async HowManyUsers(): Promise<number> {
     const users = await this.usuarioModel.find();
-    
+  
     return users.length;
   }
 
