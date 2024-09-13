@@ -31,13 +31,13 @@ export class ConvocatoriaController {
   @ApiBody({ type: CreateConvocatoriaDto, description: "For the 'file' property, needs an FIle input, it receives an file and save a file firebase url" })
   @ApiResponse({ type: Convocatoria, status: 201 })
   @UseInterceptors(FilesInterceptor('files'))
-  @Roles(RolesEnum.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
   @Post()
   create(
     @Body() createConvocatoriaDto: CreateConvocatoriaDto,
     @UploadedFiles() file: Express.Multer.File[]
   ): Promise<Convocatoria> {
+    console.log(file);
+    
     return this.convocatoriaService.create(createConvocatoriaDto, file);
   }
 

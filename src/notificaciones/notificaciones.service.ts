@@ -51,7 +51,7 @@ export class NotificacionesService {
             await this.notiConv.findByIdAndDelete(noti._id);
           }
           return noti && noti.convocatoria;
-        })
+        }),
       );
       return notisFiltered;
     } catch (error) {
@@ -108,8 +108,8 @@ export class NotificacionesService {
           select: ['titulo', 'usuarioId'],
           populate: {
             path: 'usuarioId',
-            select: ['nombre', 'apellido']
-          }
+            select: ['nombre', 'apellido'],
+          },
         })
         .exec();
 
@@ -127,7 +127,7 @@ export class NotificacionesService {
           );
         }),
       );
-      
+
       return filteredNotis;
     } catch (error) {
       throw new UnauthorizedException(error);
@@ -142,7 +142,7 @@ export class NotificacionesService {
       });
       user = decoded.sub._id;
       console.log(user);
-      
+
       const notis = await this.notiProject
         .find()
         .populate({
@@ -151,22 +151,18 @@ export class NotificacionesService {
         })
         .exec();
 
-      const filteredNotis = Promise.all(
-        notis.filter((noti) => {
-          const proyecto = noti.proyecto;
-          if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
-            this.notiProject.findByIdAndDelete(noti._id);
-          }
-          return (
-            proyecto &&
-            proyecto.usuarioId &&
-            proyecto.usuarioId._id.toString() === user &&
-            noti.title !== 'Se ha subido un nuevo proyecto!'
-          );
-        }),
-      );
+      const filteredNotis = notis.filter((noti) => {
+        const proyecto = noti.proyecto;
+        if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
+          this.notiProject.findByIdAndDelete(noti._id);
+        }
+        return (
+          proyecto.usuarioId &&
+          proyecto.usuarioId._id.toString() === user &&
+          noti.title !== 'Se ha subido un nuevo proyecto!'
+        );
+      });
 
-      
       return filteredNotis;
     } catch (error) {
       if (error.name === 'TokenExpiredError') {

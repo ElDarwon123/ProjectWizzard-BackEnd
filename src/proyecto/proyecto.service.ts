@@ -65,7 +65,6 @@ export class ProyectoService {
       const filteredProjects = projects.filter((project) => {
         return project.usuarioId && project.usuarioId._id.toString() === user;
       });
-      console.log(filteredProjects);
       
       return filteredProjects;
     } catch (error) {

@@ -1,0 +1,11 @@
+dato = input()
+
+def invertfecha(fecha):
+    nueva = fecha[::-1]
+    return nueva
+
+for i in dato:
+    print("'",dato,"'")
+    
+    
+    
