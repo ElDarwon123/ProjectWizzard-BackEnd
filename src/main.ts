@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Authorization, Content-Type, Accept',
+    allowedHeaders: 'Access-Control-Allow-Headers, Authorization, Content-Type, Accept',
   });
   const conf = new DocumentBuilder()
     .setTitle('ProjectWizzard')
