@@ -36,7 +36,6 @@ export class ConvocatoriaController {
     @Body() createConvocatoriaDto: CreateConvocatoriaDto,
     @UploadedFiles() file: Express.Multer.File[]
   ): Promise<Convocatoria> {
-    console.log(file);
     
     return this.convocatoriaService.create(createConvocatoriaDto, file);
   }
