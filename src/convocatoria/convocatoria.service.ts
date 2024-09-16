@@ -28,7 +28,6 @@ export class ConvocatoriaService {
     createConvocatoriaDto: CreateConvocatoriaDto,
     file: Express.Multer.File[],
   ): Promise<Convocatoria> {
-
       const newCon = new this.convocatoriaModel(createConvocatoriaDto);
 
       const fileUploads = file.map(async (file) => {
