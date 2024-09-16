@@ -9,6 +9,8 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ConvocatoriaService } from './convocatoria.service';
 import { CreateConvocatoriaDto } from './dto/create-convocatoria.dto';
@@ -28,6 +30,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 export class ConvocatoriaController {
   constructor(private readonly convocatoriaService: ConvocatoriaService) { }
 
+  @HttpCode(HttpStatus.CREATED)
   @ApiBody({ type: CreateConvocatoriaDto, description: "For the 'file' property, needs an FIle input, it receives an file and save a file firebase url" })
   @ApiResponse({ type: Convocatoria, status: 201 })
   @UseInterceptors(FilesInterceptor('files'))
