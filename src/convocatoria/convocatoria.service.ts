@@ -28,39 +28,39 @@ export class ConvocatoriaService {
     createConvocatoriaDto: CreateConvocatoriaDto,
     file: Express.Multer.File[],
   ): Promise<Convocatoria> {
-      const newCon = new this.convocatoriaModel(createConvocatoriaDto);
+    const newCon = new this.convocatoriaModel(createConvocatoriaDto);
 
-      const fileUploads = file.map(async (file) => {
-        const fileBuffer = file.buffer;
-        const fileDestination = `convocatoria/${newCon._id}/${file.originalname}`;
-        const fileMymeType = file.mimetype;
-        if (!fileBuffer && !fileDestination && !fileMymeType) {
-          throw new BadRequestException('Invalid file upload');
-        }
-        await this.firebaseService.uploadFile(
-          fileBuffer,
-          fileDestination,
-          fileMymeType,
-        );
+    const fileUploads = file.map(async (file) => {
+      const fileBuffer = file.buffer;
+      const fileDestination = `convocatoria/${newCon._id}/${file.originalname}`;
+      const fileMymeType = file.mimetype;
+      if (!fileBuffer && !fileDestination && !fileMymeType) {
+        throw new BadRequestException('Invalid file upload');
+      }
+      await this.firebaseService.uploadFile(
+        fileBuffer,
+        fileDestination,
+        fileMymeType,
+      );
 
-        const filesUrls = [];
-        const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(fileDestination)}?alt=media`;
-        filesUrls.push(fileUrl);
-        newCon.files.push(fileUrl);
-        return newCon.save();
-      });
+      const filesUrls = [];
+      const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(fileDestination)}?alt=media`;
+      filesUrls.push(fileUrl);
+      newCon.files.push(fileUrl);
+      return newCon.save();
+    });
 
-      //  Notification body
-      const title = 'Nueva convocatoria!';
-      const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
-      this.notisService.createNotiAnnouncement({
-        title,
-        body,
-        convocatoria: newCon.id,
-        estado: notiStateEnum.NonViwed,
-      });
-      await Promise.all(fileUploads);
-      return newCon;
+    //  Notification body
+    const title = 'Nueva convocatoria!';
+    const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
+    this.notisService.createNotiAnnouncement({
+      title,
+      body,
+      convocatoria: newCon.id,
+      estado: notiStateEnum.NonViwed,
+    });
+    await Promise.all(fileUploads);
+    return newCon;
   }
 
   async findAll(): Promise<Convocatoria[]> {
