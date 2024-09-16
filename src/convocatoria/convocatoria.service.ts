@@ -28,7 +28,7 @@ export class ConvocatoriaService {
     createConvocatoriaDto: CreateConvocatoriaDto,
     file: Express.Multer.File[],
   ): Promise<Convocatoria> {
-    try {
+
       const newCon = new this.convocatoriaModel(createConvocatoriaDto);
 
       const fileUploads = file.map(async (file) => {
@@ -62,9 +62,6 @@ export class ConvocatoriaService {
       });
       await Promise.all(fileUploads);
       return newCon;
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
   }
 
   async findAll(): Promise<Convocatoria[]> {

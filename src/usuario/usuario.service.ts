@@ -14,6 +14,7 @@ import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
 import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { JwtService } from '@nestjs/jwt';
+import { timeStamp } from 'console';
 
 @Injectable()
 export class UsuarioService {
@@ -105,7 +106,7 @@ export class UsuarioService {
 
   async findOne(id: string) {
     try {
-      return this.usuarioModel.findById(id).populate('proyectos').exec();
+      return this.usuarioModel.findById(id, {}, {timestamps: true}).populate('proyectos');
     } catch (error) {
       throw new NotFoundException('User not found');
     }
