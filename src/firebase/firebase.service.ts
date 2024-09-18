@@ -7,81 +7,62 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import { getApps, initializeApp } from 'firebase-admin/app';
 import { Readable } from 'stream';
 
 @Injectable()
 export class FirebaseService {
   private bucket: Bucket;
 
-  constructor(
-    private readonly configService: ConfigService,
-  ) {
-    admin.apps.length
-      ? admin.app
-      : admin.initializeApp({
-          credential: admin.credential.cert({
-            projectId: configService.get<string>('FIREBASE_PROJECT_ID'),
-            clientEmail: configService.get<string>('FIREBASE_CLIENT_EMAIL'),
-            privateKey: configService
-              .get<string>('FIREBASE_PRIVATE_KEY')
-              .replace(/\\n/g, '\n'),
-          }),
-          storageBucket: configService.get<string>('FIREBASE_STORAGE_BUCKET'),
-        });
+  constructor(private readonly configService: ConfigService) {
+    const firebaseConfig = {
+      apiKey: configService.get<string>('FIREBASE_API_KEY'),
+      authDomain: configService.get<string>('FIREBASE_AUTH_DOMAIN'),
+      projectId: configService.get<string>('FIREBASE_PROJECT_ID'),
+      storageBucket: configService.get<string>('FIREBASE_STORAGE_BUCKET'),
+      messagingSenderId: configService.get<string>('FIREBASE_MESSAGING_SENDER'),
+      appId: configService.get<string>('FIREBASE_APP_ID'),
+    };
+    if (!getApps().length) {
+      initializeApp(firebaseConfig);
+    }
+
+    // Configura el bucket de Firebase Storage
     this.bucket = admin.storage().bucket();
+
+  }
+  
+  async sendPushNotification(token: string, title: string, body: string, ): Promise<void> {
+    try {
+      const message = {
+        notification: {
+          title,
+          body,
+        },
+        token
+      }
+      const response = await admin.messaging().send(message);
+      console.log('noti enviada '+ response);
+      
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
   }
 
-  // async sendPushNotification(title: string, body: string, link: string) {
-    
-  //   const tokens = await this.usuarioService.getAllTokenFCM();
 
-  //   const message = tokens.map(token => ({
-  //     tokens,
-  //     notification: {
-  //       title,
-  //       body,
-  //     },
-  //     webpush: {
-  //       notification: {
-  //         title,
-  //         body,
-  //         link
-  //       }
-  //     }
-  //   }));
-  //   try {
-  //     const response = await admin.messaging().sendEachForMulticast({
-  //       tokens,
-  //       notification: {
-  //         title,
-  //         body,
-  //       },
-  //       webpush: {
-  //         notification: {
-  //           title,
-  //           body,
-  //           link,
-  //         }
-  //       },
-  //     });
-  //     console.log('notificacion sent', response);
-  //   } catch (error) {
-  //     console.error('Error sending notification:', error);
-  //   }
-  // }
-
-  async uploadFile(buffer: Buffer, destination: string, mimetype: string): Promise<void> {
-
+  async uploadFile(
+    buffer: Buffer,
+    destination: string,
+    mimetype: string,
+  ): Promise<void> {
     try {
       const stream = Readable.from(buffer);
       await this.bucket.file(destination).save(stream, {
-        contentType: mimetype
+        contentType: mimetype,
       });
       console.log('file uploaded');
-      
     } catch (error) {
-
-      throw new BadRequestException('Error uploading file:'+ error);
+      throw new BadRequestException('Error uploading file:' + error);
     }
   }
 
