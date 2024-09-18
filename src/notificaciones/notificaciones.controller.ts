@@ -89,9 +89,6 @@ export class NotificacionesController {
 
   @Get('proyectos')
   @ApiResponse({ type: NotificacionProyecto, status: 200 })
-  @ApiBearerAuth('token')
-  @Roles(RolesEnum.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
   async findAdminProjectNotis() {
     return this.notificacionesService.findAdminNotiProject();
   }
