@@ -48,6 +48,7 @@ import { forwardRef } from '@nestjs/common';
     ]),
   ],
   providers: [
+    AuthService,
     ProyectoService,
     UsuarioService,
     SeccionService,
@@ -58,9 +59,9 @@ import { forwardRef } from '@nestjs/common';
     ConfigService,
     NotificacionesService,
     JwtService,
-    AuthService,
   ],
   exports: [
+    AuthService,
     ProyectoService,
     UsuarioService,
     SeccionService,
@@ -72,7 +73,6 @@ import { forwardRef } from '@nestjs/common';
     ConfigService,
     NotificacionesService,
     JwtService,
-    AuthService,
   ],
 })
 export class SharedModule {}

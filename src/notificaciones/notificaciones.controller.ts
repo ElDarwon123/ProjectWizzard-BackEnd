@@ -127,11 +127,7 @@ export class NotificacionesController {
   @Post('send')
   @ApiBody({ type:CreateNotiAnnouncementDto, })
   @ApiResponse({ type: CreatePushNotification, status: 200 })
-  async sendPushNotifications(
-    @Body('token') token: string,
-    @Body('title') title: string,
-    @Body('body') body: string,
-  ) {
-    return await this.firebaseService.sendPushNotification(token, title, body);
+  async sendPushNotifications(@Body() notification: CreatePushNotification ) {
+    return await this.firebaseService.sendPushNotification(notification);
   }
 }

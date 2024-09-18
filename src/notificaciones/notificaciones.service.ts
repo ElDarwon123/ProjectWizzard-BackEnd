@@ -35,6 +35,7 @@ export class NotificacionesService {
     try {
       const noti = new this.notiConv(createNotificacioneDto);
       await noti.save();
+      
       return noti;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -95,6 +96,9 @@ export class NotificacionesService {
   ): Promise<NotificacionProyecto> {
     const noti = new this.notiProject(createNotificacioneDto);
     await noti.save();
+
+
+
     return noti;
   }
 

@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
 import { getApps, initializeApp } from 'firebase-admin/app';
+import { CreatePushNotification } from 'src/notificaciones/dto/create-pushNotification.dto';
 import { Readable } from 'stream';
 
 @Injectable()
@@ -32,16 +33,37 @@ export class FirebaseService {
 
   }
   
-  async sendPushNotification(token: string, title: string, body: string, ): Promise<void> {
+  async sendPushNotification(notification: CreatePushNotification ): Promise<void> {
     try {
-      const message = {
+      const response = await admin.messaging().send({
         notification: {
-          title,
-          body,
+          title: notification.title,
+          body: notification.body,
         },
-        token
-      }
-      const response = await admin.messaging().send(message);
+        token: notification.token,
+        data: {},
+        android: {
+          priority: 'high',
+          notification: {
+            sound: 'default',
+            channelId: 'default',
+          },
+        },
+        apns: {
+          headers: {
+            'apns-priority': '10',
+          },
+          payload: {
+            aps: {
+              contentAvailable: true,
+              sound: 'default',
+            },
+          },
+        },
+      }).catch((error: any) => {
+        console.log(error);
+      });
+
       console.log('noti enviada '+ response);
       
     } catch (error) {
