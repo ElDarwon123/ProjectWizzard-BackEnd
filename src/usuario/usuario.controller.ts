@@ -29,7 +29,7 @@ import { Request as Req } from 'express';
 @ApiTags('Usuario')
 @Controller('auth/usuario')
 export class UsuarioController {
-  constructor(private readonly usuarioService: UsuarioService) {}
+  constructor(private readonly usuarioService: UsuarioService) { }
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
@@ -74,10 +74,21 @@ export class UsuarioController {
   @ApiResponse({ type: Number, status: 200 })
   @Roles(RolesEnum.Aprendiz)
   @UseGuards(AuthGuard, RolesGuard)
-  howManyProjects(@Request() req: Req ) {
+  howManyProjects(@Request() req: Req) {
     const token = req.headers.authorization.split(' ')[1];
     return this.usuarioService.howManyProjects(token)
   }
+
+  @Get('week-per-day')
+  @ApiResponse({
+    example: {
+      "2024-09-18": 2
+    }, status: 200
+  })
+  async getUsersThisWeekPerDay(){
+    return await this.usuarioService.countUsersPerDayThisWeek()
+  }
+
   @Get(':id')
   @ApiBearerAuth('token')
   @ApiResponse({ type: Usuario, status: 200 })

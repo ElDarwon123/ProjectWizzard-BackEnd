@@ -62,6 +62,8 @@ export class Usuario extends Document {
   @Prop({ type: String, default: null, required: false })
   deviceToken?: string;
   
+  @Prop({ type: Boolean, required: false, default: true})
+  notificaciones?: boolean
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

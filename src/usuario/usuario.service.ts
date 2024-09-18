@@ -5,16 +5,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
 import { Usuario } from './schema/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
-import { UpdateDeviceTokenDto } from './dto/update-deviceToken.dto';
-import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import * as moment from 'moment';
+import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { timeStamp } from 'console';
 
 @Injectable()
 export class UsuarioService {
@@ -123,6 +122,35 @@ export class UsuarioService {
       throw new NotFoundException('User not found');
     }
   }
+
+  async countUsersPerDayThisWeek(): Promise<{ [key: string]: number }> {
+    const startOfWeek = moment().startOf("isoWeek").toDate(); // current week monday
+    const endOfWeek = moment().endOf("isoWeek").toDate(); // current week sunday
+
+    const users = await this.usuarioModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startOfWeek, $lte: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          count: { $sum : 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+    const dailyCount: { [ key: string ]: number } = {};
+
+    users.forEach((user)=> {
+      dailyCount[user._id] = user.count;
+    });
+
+    return dailyCount;
+}
 
   async HowManyUsers(): Promise<number> {
     const users = await this.usuarioModel.find();

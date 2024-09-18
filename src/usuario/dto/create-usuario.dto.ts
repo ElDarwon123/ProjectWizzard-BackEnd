@@ -46,9 +46,8 @@ export class CreateUsuarioDto {
   caracterizacion: string;
 
   @ApiProperty()
-  @IsString()
+  @IsStrongPassword({minLength: 8, minLowercase: 0, minNumbers: 0, minSymbols: 0, minUppercase: 0})
   @IsNotEmpty()
-  @IsStrongPassword({minLength: 8})
   contrasena: string;
 
   @ApiProperty({ enum: RolesEnum })

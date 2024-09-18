@@ -35,7 +35,7 @@ export class ProyectoController {
   constructor(
     private readonly proyectoService: ProyectoService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   // ==== POST METHODS ====
 
@@ -100,7 +100,7 @@ export class ProyectoController {
   @ApiResponse({ type: Proyecto, status: 200 })
   @Roles(RolesEnum.Admin, RolesEnum.Aprendiz)
   @UseGuards(AuthGuard, RolesGuard)
-  getUserProjects(@Request() req: Requ): Promise<Proyecto[]>{
+  getUserProjects(@Request() req: Requ): Promise<Proyecto[]> {
     const token = req.headers.authorization.split(' ')[1];
     return this.proyectoService.findUserProjects(token);
   }
@@ -114,6 +114,17 @@ export class ProyectoController {
   getNumbers() {
     return this.proyectoService.getProjectsByState('integers');
   }
+  
+  @Get('week-per-day')
+  @ApiResponse({
+    example: {
+      "2024-09-18": 2
+    }, status: 200
+  })
+  async getProjectsCountPerDayThisWeek(): Promise<{ [key: string]: number }> {
+    return await this.proyectoService.countProjectsPerDayThisWeek();
+  }
+
   @Get(':id')
   @ApiBearerAuth('token')
   @ApiResponse({ type: Proyecto, status: 200 })
