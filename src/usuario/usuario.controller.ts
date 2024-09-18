@@ -80,14 +80,11 @@ export class UsuarioController {
   }
 
   @Get('week-per-day')
-  @ApiBearerAuth('token')
   @ApiResponse({
     example: {
       "2024-09-18": 2
     }, status: 200
   })
-  @Roles(RolesEnum.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
   async getUsersThisWeekPerDay(){
     return await this.usuarioService.countUsersPerDayThisWeek()
   }

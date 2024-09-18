@@ -116,14 +116,11 @@ export class ProyectoController {
   }
   
   @Get('week-per-day')
-  @ApiBearerAuth('token')
   @ApiResponse({
     example: {
       "2024-09-18": 2
     }, status: 200
   })
-  @Roles(RolesEnum.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
   async getProjectsCountPerDayThisWeek(): Promise<{ [key: string]: number }> {
     return await this.proyectoService.countProjectsPerDayThisWeek();
   }
