@@ -58,7 +58,9 @@ export class Usuario extends Document {
   @Prop({ type: String })
   image?: string;
 
-  
+  @ApiProperty()
+  @Prop({ type: Boolean, required: false, default: true})
+  notificaciones?: boolean
 }
 
 export const usuarioSchema = SchemaFactory.createForClass(Usuario);

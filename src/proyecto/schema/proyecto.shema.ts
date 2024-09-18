@@ -3,16 +3,12 @@ import mongoose, {
   Document,
   Schema as MongooseSchema,
   ObjectId,
-  Types,
 } from 'mongoose';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { Seccion } from 'src/seccion/schema/seccion.schema';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
-import { Revision } from 'src/revision/schema/revision.schema';
-import { File } from 'src/files/schemas/file.schema';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Proyecto extends Document {
   @ApiProperty()
   @Prop({ type: String, required: true })
