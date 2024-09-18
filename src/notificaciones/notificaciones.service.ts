@@ -141,7 +141,6 @@ export class NotificacionesService {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
       user = decoded.sub._id;
-      console.log(user);
 
       const notis = await this.notiProject
         .find()
@@ -156,13 +155,16 @@ export class NotificacionesService {
         if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
           this.notiProject.findByIdAndDelete(noti._id);
         }
+        
         return (
+          proyecto &&
           proyecto.usuarioId &&
           proyecto.usuarioId._id.toString() === user &&
           noti.title !== 'Se ha subido un nuevo proyecto!'
         );
       });
 
+      
       return filteredNotis;
     } catch (error) {
       if (error.name === 'TokenExpiredError') {

@@ -183,187 +183,186 @@ export class ProyectoService {
       {
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          count: { $sum : 1 },
+          count: { $sum: 1 },
         },
       },
       {
         $sort: { _id: 1 }
       }
     ]);
-    const dailyCount: { [ key: string ]: number } = {};
+    const dailyCount: { [key: string]: number } = {};
 
-    projs.forEach((proj)=> {
+    projs.forEach((proj) => {
       dailyCount[proj._id] = proj.count;
     });
 
     return dailyCount;
-}
+  }
 
   // ==== GET BY ID METHOD ====
-  async findOne(id: string): Promise < Proyecto > {
-  const proyecto = await this.proyectoModel
-    .findById(id)
-    .populate(['usuarioId', 'secciones', 'revisiones'])
-    .exec();
-  if(!proyecto) {
-    throw new NotFoundException(`Proyecto with ID ${id} not found`);
-  }
+  async findOne(id: string): Promise<Proyecto> {
+    const proyecto = await this.proyectoModel
+      .findById(id)
+      .populate(['usuarioId', 'secciones', 'revisiones'])
+      .exec();
+    if (!proyecto) {
+      throw new NotFoundException(`Proyecto with ID ${id} not found`);
+    }
     return proyecto;
-}
+  }
 
   // ==== CREATE METHODS ====
 
   async create(
-  createProyectoDto: CreateProyectoDto,
-  imageBuffer ?: Buffer,
-  imageDestination ?: string,
-  imageMymeType ?: string,
-): Promise < Proyecto > {
-  if(imageBuffer && imageDestination && imageMymeType) {
-  await this.firebaseService.uploadFile(
-    imageBuffer,
-    imageDestination,
-    imageMymeType,
-  );
-  createProyectoDto.image = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(imageDestination)}?alt=media`;
-}
+    createProyectoDto: CreateProyectoDto,
+    imageBuffer?: Buffer,
+    imageDestination?: string,
+    imageMymeType?: string,
+  ): Promise<Proyecto> {
+    if (imageBuffer && imageDestination && imageMymeType) {
+      await this.firebaseService.uploadFile(
+        imageBuffer,
+        imageDestination,
+        imageMymeType,
+      );
+      createProyectoDto.image = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(imageDestination)}?alt=media`;
+    }
 
-const createdProyecto = new this.proyectoModel(createProyectoDto);
+    const createdProyecto = new this.proyectoModel(createProyectoDto);
 
-const proyecto = await createdProyecto.save();
+    const proyecto = await createdProyecto.save();
 
-// se añade proyecto a usuario
-await this.usuarioService.addProyectoToUser(
-  createProyectoDto.usuarioId,
-  proyecto.id,
-);
+    // se añade proyecto a usuario
+    await this.usuarioService.addProyectoToUser(
+      createProyectoDto.usuarioId,
+      proyecto.id,
+    );
 
-// notification body
-const title = 'Se ha subido un nuevo proyecto!';
-const body = 'Ha llegado un nuevo proyecto al gremio, vamos a revisarlo!';
-const url = proyecto.id;
+    // notification body
+    const title = 'Se ha subido un nuevo proyecto!';
+    const body = 'Ha llegado un nuevo proyecto al gremio, vamos a revisarlo!';
+    const url = proyecto.id;
 
-await this.notiService.createNotiProject({
-  title,
-  body,
-  proyecto: proyecto.id,
-  url,
-  estado: notiStateEnum.NonViwed,
-});
+    await this.notiService.createNotiProject({
+      title,
+      body,
+      proyecto: proyecto.id,
+      url,
+      estado: notiStateEnum.NonViwed,
+    });
 
-return proyecto;
+    return proyecto;
   }
 
   // ==== ADDERs METHOD ====
 
   async addFileToProject(
-  projectId: ObjectId,
-  files: Express.Multer.File[],
-): Promise < void> {
-  const proj = await this.proyectoModel.findById(projectId);
-  if(!proj) {
-    throw new NotFoundException('Project not found');
-  }
-    const fileUploads = files.map(async (file) => {
-    const buffer = file.buffer;
-    const destination = `projects/${projectId}/${file.originalname}`;
-    const mymetype = file.mimetype;
-
-    if (!buffer || !mymetype || !destination) {
-      throw new BadRequestException('Invalid file data');
+    projectId: ObjectId,
+    files: Express.Multer.File[],
+  ): Promise<void> {
+    const proj = await this.proyectoModel.findById(projectId);
+    if (!proj) {
+      throw new NotFoundException('Project not found');
     }
+    const fileUploads = files.map(async (file) => {
+      const buffer = file.buffer;
+      const destination = `projects/${projectId}/${file.originalname}`;
+      const mymetype = file.mimetype;
 
-    await this.firebaseService.uploadFile(buffer, destination, mymetype);
-    const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(destination)}?alt=media`;
-    proj.files.push(fileUrl);
-    await proj.save();
-    return proj;
-  });
-  await Promise.all(fileUploads);
-}
+      if (!buffer || !mymetype || !destination) {
+        throw new BadRequestException('Invalid file data');
+      }
+
+      await this.firebaseService.uploadFile(buffer, destination, mymetype);
+      const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(destination)}?alt=media`;
+      proj.files.push(fileUrl);
+      await proj.save();
+      return proj;
+    });
+    await Promise.all(fileUploads);
+  }
 
   async addSeccionToProject(
-  projectId: ObjectId,
-  seccionId: ObjectId,
-): Promise < Proyecto > {
-  const proj = await this.proyectoModel.findById(projectId);
-  if(!proj) {
-    throw new NotFoundException('Project not found');
-  }
+    projectId: ObjectId,
+    seccionId: ObjectId,
+  ): Promise<Proyecto> {
+    const proj = await this.proyectoModel.findById(projectId);
+    if (!proj) {
+      throw new NotFoundException('Project not found');
+    }
 
     proj.secciones.push(seccionId);
-  await proj.save();
-  return proj;
-}
+    await proj.save();
+    return proj;
+  }
 
   async addRevisionToProject(
-  projectId: ObjectId,
-  revisionId: ObjectId,
-): Promise < Proyecto > {
-  const proj = await this.proyectoModel.findById(projectId);
-  if(!proj) {
-    throw new NotFoundException('Project not found');
-  }
+    projectId: ObjectId,
+    revisionId: ObjectId,
+  ): Promise<Proyecto> {
+    const proj = await this.proyectoModel.findById(projectId);
+    if (!proj) {
+      throw new NotFoundException('Project not found');
+    }
     proj.revisiones.push(revisionId);
 
-  await proj.save();
-  return proj;
-}
+    await proj.save();
+    return proj;
+  }
 
   // ==== UPDATE METHOD ====
 
   async update(
-  id: string,
-  updateProyectoDto: UpdateProyectoDto,
-): Promise < Proyecto > {
-  const updatedProyecto = await this.proyectoModel
-    .findByIdAndUpdate(id, updateProyectoDto, { new: true })
-    .populate({
-      path: 'usuarioId',
-    })
-    .exec();
-  if(!updatedProyecto) {
-    throw new NotFoundException(`Proyecto not found`);
-  }
-    if(
-    updatedProyecto.estado === EstadoProyecto.EN_REVISION ||
+    id: string,
+    updateProyectoDto: UpdateProyectoDto,
+  ): Promise<Proyecto> {
+    const updatedProyecto = await this.proyectoModel
+      .findByIdAndUpdate(id, updateProyectoDto, { new: true })
+      .populate({
+        path: 'usuarioId',
+      })
+      .exec();
+    if (!updatedProyecto) {
+      throw new NotFoundException(`Proyecto not found`);
+    }
+    if (updatedProyecto.usuarioId.notificaciones === true) {
+      const userEmail = updatedProyecto.usuarioId.email;
+      await this.authService.sendNotificationEmail(
+        userEmail,
+        updatedProyecto.id,
+      );
+    };
+    if (
+      updatedProyecto.estado === EstadoProyecto.EN_REVISION ||
       updatedProyecto.estado === EstadoProyecto.REVISADO ||
       updatedProyecto.estado === EstadoProyecto.COMPLETADO ||
       updatedProyecto.estado === EstadoProyecto.RECHAZADO
     ) {
-  const title = `Tu Proyecto ${updatedProyecto.titulo} fue Juzgado!`;
-  const body = `Tu proyecto ha sido juzgado por los magos, ellos dicen que está ${updatedProyecto.estado}, mira que más han dicho de tu proyecto.`;
-  const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/administrador/review?id=${updatedProyecto.id}`;
-  await this.notiService.createNotiProject({
-    title,
-    body,
-    url,
-    proyecto: updatedProyecto.id,
-    estado: notiStateEnum.NonViwed,
-  });
+      const title = `Tu Proyecto ${updatedProyecto.titulo} fue Juzgado!`;
+      const body = `Tu proyecto ha sido juzgado por los magos, ellos dicen que está ${updatedProyecto.estado}, mira que más han dicho de tu proyecto.`;
+      const url = `https://project-wizzard-react-1ea9hjmqv-neukkkens-projects.vercel.app/administrador/review?id=${updatedProyecto.id}`;
+      await this.notiService.createNotiProject({
+        title,
+        body,
+        url,
+        proyecto: updatedProyecto.id,
+        estado: notiStateEnum.NonViwed,
+      });
 
-  if (updatedProyecto.usuarioId.notificaciones === true) {
-    const userEmail = updatedProyecto.usuarioId.email;
-    await this.authService.sendNotificationEmail(
-      userEmail,
-      updatedProyecto.id,
-    );
-  };
-
-  return updatedProyecto;
-}
-return updatedProyecto;
+      return updatedProyecto;
+    }
+    return updatedProyecto;
   }
 
   // ==== DELETE METHOD ====
 
-  async remove(id: string): Promise < Proyecto > {
-  const deletedProyecto = await this.proyectoModel
-    .findByIdAndDelete(id)
-    .exec();
-  if(!deletedProyecto) {
-    throw new NotFoundException(`Proyecto with ID ${id} not found`);
-  }
+  async remove(id: string): Promise<Proyecto> {
+    const deletedProyecto = await this.proyectoModel
+      .findByIdAndDelete(id)
+      .exec();
+    if (!deletedProyecto) {
+      throw new NotFoundException(`Proyecto with ID ${id} not found`);
+    }
     return deletedProyecto;
-}
+  }
 }

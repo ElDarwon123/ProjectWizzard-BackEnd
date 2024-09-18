@@ -80,6 +80,13 @@ export class NotificacionesController {
     return this.notificacionesService.createNotiProject(createNotificacioneDto);
   }
 
+  @Get('mis-proyectos')
+  @ApiResponse({ type: NotificacionProyecto, status: 200 })
+  async findAllProjectNotis(@Request() req: Requ) {
+    const token = req.headers.authorization.split(' ')[1];
+    return await this.notificacionesService.findAllNotisProjects(token);
+  }
+
   @Get('proyectos')
   @ApiResponse({ type: NotificacionProyecto, status: 200 })
   @ApiBearerAuth('token')
@@ -87,13 +94,6 @@ export class NotificacionesController {
   @UseGuards(AuthGuard, RolesGuard)
   async findAdminProjectNotis() {
     return this.notificacionesService.findAdminNotiProject();
-  }
-
-  @Get('mis-proyectos')
-  @ApiResponse({ type: NotificacionProyecto, status: 200 })
-  async findAllProjectNotis(@Request() req: Requ) {
-    const token = req.headers.authorization.split(' ')[1];
-    return await this.notificacionesService.findAllNotisProjects(token);
   }
 
   @Get('mis-proyectos/:id')
