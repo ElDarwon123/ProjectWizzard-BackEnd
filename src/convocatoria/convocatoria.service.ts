@@ -13,6 +13,8 @@ import { NotificacionesService } from 'src/notificaciones/notificaciones.service
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
 import { ConfigService } from '@nestjs/config';
 import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
+import { AuthService } from 'src/auth/auth.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 
 @Injectable()
 export class ConvocatoriaService {
@@ -22,6 +24,8 @@ export class ConvocatoriaService {
     private readonly firebaseService: FirebaseService,
     private readonly notisService: NotificacionesService,
     private readonly configService: ConfigService,
+    private readonly userService: UsuarioService,
+    private readonly authService: AuthService,
   ) {}
 
   async create(
@@ -29,6 +33,7 @@ export class ConvocatoriaService {
     file: Express.Multer.File[],
   ): Promise<Convocatoria> {
     const newCon = new this.convocatoriaModel(createConvocatoriaDto);
+    const emails = this.userService.findAllEmailsRegistered();
 
     const fileUploads = file.map(async (file) => {
       const fileBuffer = file.buffer;
@@ -51,6 +56,15 @@ export class ConvocatoriaService {
     });
 
     //  Notification body
+    // Send Email notification
+    (await emails).forEach((email) => {
+      this.authService.sendAnnouncementEmailNoti(
+        email.email,
+        newCon.title,
+        newCon.descripcion,
+      );
+    });
+
     const title = 'Nueva convocatoria!';
     const body = 'Se ha creado una nueva convocatoria, ¡Revísala ahora!';
     this.notisService.createNotiAnnouncement({
@@ -59,6 +73,22 @@ export class ConvocatoriaService {
       convocatoria: newCon.id,
       estado: notiStateEnum.NonViwed,
     });
+
+    (await emails).forEach(async (email) => {
+      const user = await this.userService.findOne(email.id);
+      if (!user.deviceToken || user.deviceToken === null) {
+        console.log('device token not found');
+      } else {
+        this.firebaseService.sendPushNotification({
+          body: body,
+          title: title,
+          token: user.deviceToken,
+        });
+
+        console.log('noti push sended');
+      }
+    });
+
     await Promise.all(fileUploads);
     return newCon;
   }
@@ -66,7 +96,6 @@ export class ConvocatoriaService {
   async findAll(): Promise<Convocatoria[]> {
     try {
       const now = new Date();
-
       const convs = await this.convocatoriaModel.find();
       await Promise.allSettled(
         convs.map((conv) => this.announcementFinished(conv.id, now)),

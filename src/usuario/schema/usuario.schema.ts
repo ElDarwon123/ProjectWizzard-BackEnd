@@ -59,6 +59,9 @@ export class Usuario extends Document {
   image?: string;
 
   @ApiProperty()
+  @Prop({ type: String, default: null, required: false })
+  deviceToken?: string;
+  
   @Prop({ type: Boolean, required: false, default: true})
   notificaciones?: boolean
 }

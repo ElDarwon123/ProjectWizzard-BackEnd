@@ -9,7 +9,7 @@ import { UsuarioService } from 'src/usuario/usuario.service';
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { BlackList } from './schema/auth.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateBlackList } from './dto/create-blackList.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UpdateUsuarioDto } from 'src/usuario/dto/update-usuario.dto';
@@ -17,6 +17,7 @@ import { Usuario } from 'src/usuario/schema/usuario.schema';
 import { ProyectoService } from 'src/proyecto/proyecto.service';
 import { ConfigService } from '@nestjs/config';
 import { timeStamp } from 'console';
+import { ConvocatoriaService } from 'src/convocatoria/convocatoria.service';
 
 @Injectable()
 export class AuthService {
@@ -37,8 +38,7 @@ export class AuthService {
       user = decoded.sub._id;
       const currentUser = await this.userService.findOne(user);
 
-
-      return {sub:currentUser};
+      return { sub: currentUser };
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token has expired');
@@ -199,6 +199,28 @@ export class AuthService {
       } else {
         throw new UnauthorizedException('Unauthorized access');
       }
+    }
+  }
+
+  async sendAnnouncementEmailNoti(
+    email: string,
+    annTitle: string,
+    annDesc: string,
+  ): Promise<void> {
+    await this.mailerService.verifyAllTransporters();
+
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Notificacion de convocatoria',
+        template: 'notificacion-convocatoria',
+        context: {
+          AnncmtName: annTitle,
+          AnnDesc: annDesc,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message)
     }
   }
 }

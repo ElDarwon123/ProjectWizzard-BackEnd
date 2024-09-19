@@ -23,11 +23,16 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesEnum } from 'src/enums/role.enum';
 import { NotificacionConvocatoria } from './schemas/notificacion-convocatoria.schema';
 import { NotificacionProyecto } from './schemas/notificacion-proyecto.schema';
+import { FirebaseService } from 'src/firebase/firebase.service';
+import { CreatePushNotification } from './dto/create-pushNotification.dto';
 
 @ApiTags('Notificaciones')
 @Controller('notificaciones')
 export class NotificacionesController {
-  constructor(private readonly notificacionesService: NotificacionesService) {}
+  constructor(
+    private readonly notificacionesService: NotificacionesService,
+    private readonly firebaseService: FirebaseService,
+  ) {}
 
   // ==== Announcement Notifications ====
 
@@ -116,5 +121,13 @@ export class NotificacionesController {
   @ApiResponse({ type: NotificacionProyecto, status: 200 })
   removeProjectNoti(@Param('id') id: Types.ObjectId) {
     return this.notificacionesService.removeNotiProject(id);
+  }
+
+  // ==== Push Notifications ====
+  @Post('send')
+  @ApiBody({ type:CreateNotiAnnouncementDto, })
+  @ApiResponse({ type: CreatePushNotification, status: 200 })
+  async sendPushNotifications(@Body() notification: CreatePushNotification ) {
+    return await this.firebaseService.sendPushNotification(notification);
   }
 }

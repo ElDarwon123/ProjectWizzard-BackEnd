@@ -5,15 +5,16 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
 import { Usuario } from './schema/usuario.schema';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
-import { ConfigService } from '@nestjs/config';
 import { FirebaseService } from 'src/firebase/firebase.service';
-import { JwtService } from '@nestjs/jwt';
 import * as moment from 'moment';
+import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { RolesEnum } from 'src/enums/role.enum';
 
 @Injectable()
 export class UsuarioService {
@@ -97,10 +98,16 @@ export class UsuarioService {
 
   async findAll(): Promise<Usuario[]> {
     try {
-      return this.usuarioModel.find().populate('proyectos').exec();
+      return this.usuarioModel.find().exec();
     } catch (error) {
       throw new NotFoundException('User not found');
     }
+  }
+
+  async findAllEmailsRegistered(): Promise<any[]> {
+    const users = await this.usuarioModel.find({role: RolesEnum.Aprendiz}, 'email').exec();
+
+    return users;
   }
 
   async findOne(id: string) {
