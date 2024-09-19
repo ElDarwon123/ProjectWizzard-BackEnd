@@ -137,9 +137,7 @@ export class NotificacionesService {
   async findAllNotisProjects(token: string): Promise<NotificacionProyecto[]> {
     let user: string;
     try {
-      const decoded = this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      const decoded = this.jwtService.decode(token);
       user = decoded.sub._id;
 
       const notis = await this.notiProject

@@ -133,9 +133,7 @@ export class AuthService {
   async resetPassword(token: string, newPassword: UpdateUsuarioDto) {
     let email: string;
     let id: string;
-    const decoded = await this.jwtService.verifyAsync(token, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-    });
+    const decoded = await this.jwtService.decode(token)
     if (!decoded) {
       throw new UnauthorizedException('Token not found');
     }
