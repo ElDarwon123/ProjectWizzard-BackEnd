@@ -7,6 +7,7 @@ import mongoose, {
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
+import { Convocatoria } from 'src/convocatoria/schemas/convocatoria.entity';
 
 @Schema({ timestamps: true })
 export class Proyecto extends Document {
@@ -47,6 +48,13 @@ export class Proyecto extends Document {
     ref: 'Revision',
   })
   revisiones: ObjectId[];
+
+  @ApiProperty()
+  @Prop({ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Convocatoria',
+    default: null })
+  convocatoria: Convocatoria;
 
   @ApiProperty()
   @Prop({ type: String })

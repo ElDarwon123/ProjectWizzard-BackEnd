@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,7 +9,7 @@ import { CreateConvocatoriaDto } from './dto/create-convocatoria.dto';
 import { UpdateConvocatoriaDto } from './dto/update-convocatoria.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Convocatoria } from './schemas/convocatoria.entity';
-import { Model, Types } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { NotificacionesService } from 'src/notificaciones/notificaciones.service';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
@@ -15,6 +17,8 @@ import { ConfigService } from '@nestjs/config';
 import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
 import { AuthService } from 'src/auth/auth.service';
 import { UsuarioService } from 'src/usuario/usuario.service';
+import { AddProjToAnnouncementDto } from './dto/addProject-to-convocatoria.dto';
+import { ProyectoService } from 'src/proyecto/proyecto.service';
 
 @Injectable()
 export class ConvocatoriaService {
@@ -25,8 +29,11 @@ export class ConvocatoriaService {
     private readonly notisService: NotificacionesService,
     private readonly configService: ConfigService,
     private readonly userService: UsuarioService,
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
-  ) {}
+    @Inject(forwardRef(() => ProyectoService))
+    private readonly proyectoService: ProyectoService
+  ) { }
 
   async create(
     createConvocatoriaDto: CreateConvocatoriaDto,
@@ -78,15 +85,14 @@ export class ConvocatoriaService {
       const user = await this.userService.findOne(email.id);
       if (!user.deviceToken || user.deviceToken === null) {
         console.log('device token not found');
-      } else {
-        this.firebaseService.sendPushNotification({
-          body: body,
-          title: title,
-          token: user.deviceToken,
-        });
-
-        console.log('noti push sended');
       }
+      await this.firebaseService.sendPushNotification({
+        body: body,
+        title: title,
+        token: user.deviceToken,
+      });
+      console.log('noti push sended');
+
     });
 
     await Promise.all(fileUploads);
@@ -119,6 +125,17 @@ export class ConvocatoriaService {
     }
   }
 
+  async findProjectInAnn(projectId: Types.ObjectId) {
+    try {
+      const ann = await this.convocatoriaModel.findOne({ proyectos: projectId }).select('title')
+      return ann
+
+
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
+  }
+
   async update(
     id: Types.ObjectId,
     updateConvocatoriaDto: UpdateConvocatoriaDto,
@@ -129,10 +146,41 @@ export class ConvocatoriaService {
         updateConvocatoriaDto,
         { new: true },
       );
+
       return conv;
     } catch (error) {
       throw new BadRequestException('Invalid id or body');
     }
+  }
+
+  async addProjectToAnnouncement(projectId: AddProjToAnnouncementDto, announcementId: Types.ObjectId) {
+    const ann = await this.convocatoriaModel.findById(announcementId);
+
+    if (!ann) {
+      throw new NotFoundException('Announcement not found')
+    }
+    const projId = String(projectId.proyecto);
+
+    const project = await this.proyectoService.findOne(projId);
+    if (!project) {
+      throw new NotFoundException('Proyecto no encontrado')
+    }
+
+    if (project.convocatoria) {
+      throw new BadRequestException('Este proyecto ya está en una convocatoria')
+    }
+
+    if (ann.proyectos.includes(projectId.proyecto)) {
+      throw new BadRequestException(`Este proyecto está en la convocatoria ${ann.title}`)
+    }
+
+    ann.proyectos.push(projectId.proyecto);
+    await ann.save();
+
+    project.convocatoria = ann
+    await project.save();
+
+    return ann;
   }
 
   async announcementFinished(id: Types.ObjectId, now: Date) {

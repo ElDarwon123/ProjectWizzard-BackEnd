@@ -1,7 +1,8 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
+import mongoose, { Document, ObjectId } from 'mongoose';
 import { estadoConvocatoria } from 'src/enums/convocatoria.enum';
+import { Proyecto } from 'src/proyecto/schema/proyecto.shema';
 
 export class AnnouncementTemplate {
   @ApiProperty({ type: String, example: 'Planteamiento del problema' })
@@ -49,13 +50,18 @@ export class Convocatoria extends Document {
   })
   estado: estadoConvocatoria;
 
-  @ApiProperty({example: 'Insertar un archivo que contenga información sobre la convocatoria'})
+  @ApiProperty({ example: 'Insertar un archivo que contenga información sobre la convocatoria' })
   @Prop({ type: [String], required: false })
   files?: String[];
 
   @ApiProperty({ type: AnnouncementTemplate, examples: AnnouncementTemplate })
   @Prop()
   template: AnnouncementTemplate[];
+
+  @ApiProperty()
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Proyecto' , unique: true, once:true})
+  proyectos: ObjectId[];
+
 }
 
 export const convocatoriaSchema = SchemaFactory.createForClass(Convocatoria);

@@ -22,10 +22,17 @@ export class FirebaseService {
       projectId: configService.get<string>('FIREBASE_PROJECT_ID'),
       storageBucket: configService.get<string>('FIREBASE_STORAGE_BUCKET'),
       messagingSenderId: configService.get<string>('FIREBASE_MESSAGING_SENDER'),
+      clientEmail: configService.get<string>('FIREBASE_CLIENT_EMAIL'),
       appId: configService.get<string>('FIREBASE_APP_ID'),
+      privateKey: configService
+              .get<string>('FIREBASE_PRIVATE_KEY')
+              .replace(/\\n/g, '\n'),
     };
     if (!getApps().length) {
-      initializeApp(firebaseConfig);
+      initializeApp({
+        credential: admin.credential.cert(firebaseConfig),
+        storageBucket: configService.get<string>('FIREBASE_STORAGE_BUCKET'),
+      });
     }
 
     // Configura el bucket de Firebase Storage

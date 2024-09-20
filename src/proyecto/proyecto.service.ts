@@ -20,6 +20,7 @@ import { forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
 import * as moment from 'moment';
+import { ConvocatoriaService } from 'src/convocatoria/convocatoria.service';
 
 @Injectable()
 export class ProyectoService {
@@ -32,6 +33,7 @@ export class ProyectoService {
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
+    private readonly convService: ConvocatoriaService,
   ) { }
 
   // ======== GET METHODS ======== //
@@ -60,7 +62,7 @@ export class ProyectoService {
 
       const projects = await this.proyectoModel
         .find()
-        .populate(['usuarioId', 'secciones', 'revisiones'])
+        .populate(['usuarioId', 'secciones', 'revisiones', 'convocatoria'])
         .exec();
 
       const filteredProjects = projects.filter((project) => {
@@ -203,7 +205,7 @@ export class ProyectoService {
   async findOne(id: string): Promise<Proyecto> {
     const proyecto = await this.proyectoModel
       .findById(id)
-      .populate(['usuarioId', 'secciones', 'revisiones'])
+      .populate(['usuarioId', 'secciones', 'revisiones', {path: 'convocatoria', select: ['title', 'estado']}])
       .exec();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
@@ -348,7 +350,11 @@ export class ProyectoService {
         proyecto: updatedProyecto.id,
         estado: notiStateEnum.NonViwed,
       });
-
+      await this.firebaseService.sendPushNotification({
+        title: title, 
+        body: body, 
+        token: updatedProyecto.usuarioId.deviceToken,
+      })
       return updatedProyecto;
     }
     return updatedProyecto;
