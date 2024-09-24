@@ -3,16 +3,13 @@ import mongoose, {
   Document,
   Schema as MongooseSchema,
   ObjectId,
-  Types,
 } from 'mongoose';
 import { EstadoProyecto } from '../../enums/estado-proyecto.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { Seccion } from 'src/seccion/schema/seccion.schema';
 import { Usuario } from 'src/usuario/schema/usuario.schema';
-import { Revision } from 'src/revision/schema/revision.schema';
-import { File } from 'src/files/schemas/file.schema';
+import { Convocatoria } from 'src/convocatoria/schemas/convocatoria.entity';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Proyecto extends Document {
   @ApiProperty()
   @Prop({ type: String, required: true })
@@ -51,6 +48,13 @@ export class Proyecto extends Document {
     ref: 'Revision',
   })
   revisiones: ObjectId[];
+
+  @ApiProperty()
+  @Prop({ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Convocatoria',
+    default: null })
+  convocatoria: Convocatoria;
 
   @ApiProperty()
   @Prop({ type: String })

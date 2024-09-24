@@ -19,6 +19,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { notiStateEnum } from 'src/enums/estado-noti.enum';
+import * as moment from 'moment';
+import { ConvocatoriaService } from 'src/convocatoria/convocatoria.service';
 
 @Injectable()
 export class ProyectoService {
@@ -31,7 +33,8 @@ export class ProyectoService {
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly convService: ConvocatoriaService,
+  ) { }
 
   // ======== GET METHODS ======== //
 
@@ -41,7 +44,7 @@ export class ProyectoService {
       .find()
       .populate(['usuarioId', 'secciones', 'revisiones'])
       .exec();
-    
+
     const filteredProj = projects.filter(async (proj) => {
       if (proj.usuarioId === null) {
         await this.proyectoModel.findByIdAndDelete(proj._id);
@@ -59,13 +62,13 @@ export class ProyectoService {
 
       const projects = await this.proyectoModel
         .find()
-        .populate(['usuarioId', 'secciones', 'revisiones'])
+        .populate(['usuarioId', 'secciones', 'revisiones', 'convocatoria'])
         .exec();
-      
+
       const filteredProjects = projects.filter((project) => {
         return project.usuarioId && project.usuarioId._id.toString() === user;
       });
-      
+
       return filteredProjects;
     } catch (error) {
       throw new NotFoundException(error.message);
@@ -169,11 +172,40 @@ export class ProyectoService {
     }
   }
 
+  async countProjectsPerDayThisWeek(): Promise<{ [key: string]: number }> {
+    const startOfWeek = moment().startOf("isoWeek").toDate(); // current week monday
+    const endOfWeek = moment().endOf("isoWeek").toDate(); // current week sunday
+
+    const projs = await this.proyectoModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startOfWeek, $lte: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+    const dailyCount: { [key: string]: number } = {};
+
+    projs.forEach((proj) => {
+      dailyCount[proj._id] = proj.count;
+    });
+
+    return dailyCount;
+  }
+
   // ==== GET BY ID METHOD ====
   async findOne(id: string): Promise<Proyecto> {
     const proyecto = await this.proyectoModel
       .findById(id)
-      .populate(['usuarioId', 'secciones', 'revisiones'])
+      .populate(['usuarioId', 'secciones', 'revisiones', {path: 'convocatoria', select: ['title', 'estado']}])
       .exec();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
@@ -207,7 +239,7 @@ export class ProyectoService {
       createProyectoDto.usuarioId,
       proyecto.id,
     );
-    
+
     // notification body
     const title = 'Se ha subido un nuevo proyecto!';
     const body = 'Ha llegado un nuevo proyecto al gremio, vamos a revisarlo!';
@@ -295,6 +327,13 @@ export class ProyectoService {
     if (!updatedProyecto) {
       throw new NotFoundException(`Proyecto not found`);
     }
+    if (updatedProyecto.usuarioId.notificaciones === true) {
+      const userEmail = updatedProyecto.usuarioId.email;
+      await this.authService.sendNotificationEmail(
+        userEmail,
+        updatedProyecto.id,
+      );
+    };
     if (
       updatedProyecto.estado === EstadoProyecto.EN_REVISION ||
       updatedProyecto.estado === EstadoProyecto.REVISADO ||
@@ -311,11 +350,11 @@ export class ProyectoService {
         proyecto: updatedProyecto.id,
         estado: notiStateEnum.NonViwed,
       });
-      const userEmail = updatedProyecto.usuarioId.email;
-      await this.authService.sendNotificationEmail(
-        userEmail,
-        updatedProyecto.id,
-      );
+      await this.firebaseService.sendPushNotification({
+        title: title, 
+        body: body, 
+        token: updatedProyecto.usuarioId.deviceToken,
+      })
       return updatedProyecto;
     }
     return updatedProyecto;

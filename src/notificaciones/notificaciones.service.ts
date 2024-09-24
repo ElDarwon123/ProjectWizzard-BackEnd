@@ -35,6 +35,7 @@ export class NotificacionesService {
     try {
       const noti = new this.notiConv(createNotificacioneDto);
       await noti.save();
+      
       return noti;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -95,6 +96,9 @@ export class NotificacionesService {
   ): Promise<NotificacionProyecto> {
     const noti = new this.notiProject(createNotificacioneDto);
     await noti.save();
+
+
+
     return noti;
   }
 
@@ -137,11 +141,8 @@ export class NotificacionesService {
   async findAllNotisProjects(token: string): Promise<NotificacionProyecto[]> {
     let user: string;
     try {
-      const decoded = this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      const decoded = this.jwtService.decode(token);
       user = decoded.sub._id;
-      console.log(user);
 
       const notis = await this.notiProject
         .find()
@@ -156,13 +157,16 @@ export class NotificacionesService {
         if (noti.proyecto === null || noti.proyecto.usuarioId === null) {
           this.notiProject.findByIdAndDelete(noti._id);
         }
+        
         return (
+          proyecto &&
           proyecto.usuarioId &&
           proyecto.usuarioId._id.toString() === user &&
           noti.title !== 'Se ha subido un nuevo proyecto!'
         );
       });
 
+      
       return filteredNotis;
     } catch (error) {
       if (error.name === 'TokenExpiredError') {

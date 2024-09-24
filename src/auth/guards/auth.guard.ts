@@ -7,7 +7,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -27,9 +27,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token not found');
     }
     try {
-      const payLoad = this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      const payLoad = this.jwtService.decode(token);
       if (payLoad instanceof TokenExpiredError) {
         throw new UnauthorizedException('Invalid token expired');
       }
@@ -42,7 +40,7 @@ export class AuthGuard implements CanActivate {
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token has expired');
-      } else if (error.name === 'JsonWebTokenError') {
+      } else if (error.name === 'JsonWebTokenError' || new JsonWebTokenError('jwt malformed', {name: 'Invalid token', message: 'Invalid token', stack:'400'})) {
         throw new UnauthorizedException('Invalid token');
       } else {
         throw new UnauthorizedException('Unauthorized access');
