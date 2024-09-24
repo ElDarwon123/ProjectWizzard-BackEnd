@@ -59,7 +59,7 @@ export class Convocatoria extends Document {
   template: AnnouncementTemplate[];
 
   @ApiProperty()
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Proyecto' , unique: true, once:true})
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Proyecto' })
   proyectos: ObjectId[];
 
 }
