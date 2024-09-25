@@ -351,11 +351,13 @@ export class ProyectoService {
         proyecto: updatedProyecto.id,
         estado: notiStateEnum.NonViwed,
       });
-      await this.firebaseService.sendPushNotification({
-        title: title, 
-        body: body, 
-        token: updatedProyecto.usuarioId.deviceToken,
-      })
+      if (updatedProyecto.usuarioId.deviceToken !== null || '' || undefined) {
+        await this.firebaseService.sendPushNotification({
+          title: title, 
+          body: body, 
+          token: updatedProyecto.usuarioId.deviceToken,
+        })
+      }
       return updatedProyecto;
     }
     return updatedProyecto;
