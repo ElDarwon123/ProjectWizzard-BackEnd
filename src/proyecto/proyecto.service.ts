@@ -42,7 +42,7 @@ export class ProyectoService {
   async findAll(): Promise<Proyecto[]> {
     const projects = await this.proyectoModel
       .find()
-      .select(['titulo', 'estado', 'usuarioId'])
+      .select(['titulo', 'descripcion', 'estado', 'usuarioId'])
       .populate({ path: 'usuarioId', select: ['nombre', 'apellido'] })
       .exec();
 
