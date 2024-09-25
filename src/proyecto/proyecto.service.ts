@@ -42,7 +42,8 @@ export class ProyectoService {
   async findAll(): Promise<Proyecto[]> {
     const projects = await this.proyectoModel
       .find()
-      .populate(['usuarioId', 'secciones', 'revisiones'])
+      .select(['titulo', 'estado', 'usuarioId'])
+      .populate({ path: 'usuarioId', select: ['nombre', 'apellido'] })
       .exec();
 
     const filteredProj = projects.filter(async (proj) => {
