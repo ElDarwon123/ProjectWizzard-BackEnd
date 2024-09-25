@@ -42,7 +42,8 @@ export class ProyectoService {
   async findAll(): Promise<Proyecto[]> {
     const projects = await this.proyectoModel
       .find()
-      .populate(['usuarioId', 'secciones', 'revisiones'])
+      .select(['titulo', 'estado', 'usuarioId'])
+      .populate({ path: 'usuarioId', select: ['nombre', 'apellido'] })
       .exec();
 
     const filteredProj = projects.filter(async (proj) => {
@@ -205,7 +206,7 @@ export class ProyectoService {
   async findOne(id: string): Promise<Proyecto> {
     const proyecto = await this.proyectoModel
       .findById(id)
-      .populate(['usuarioId', 'secciones', 'revisiones', {path: 'convocatoria', select: ['title', 'estado']}])
+      .populate(['usuarioId', 'secciones', 'revisiones', { path: 'convocatoria', select: ['title', 'estado'] }])
       .exec();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto with ID ${id} not found`);
@@ -351,8 +352,8 @@ export class ProyectoService {
         estado: notiStateEnum.NonViwed,
       });
       await this.firebaseService.sendPushNotification({
-        title: title, 
-        body: body, 
+        title: title,
+        body: body,
         token: updatedProyecto.usuarioId.deviceToken,
       })
       return updatedProyecto;
