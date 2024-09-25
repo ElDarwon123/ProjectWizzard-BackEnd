@@ -86,11 +86,13 @@ export class ConvocatoriaService {
       if (!user.deviceToken || user.deviceToken === null) {
         console.log('device token not found');
       }
-      await this.firebaseService.sendPushNotification({
-        body: body,
-        title: title,
-        token: user.deviceToken,
-      });
+      if (user.deviceToken !== null ) {
+        await this.firebaseService.sendPushNotification({
+          body: body,
+          title: title,
+          token: user.deviceToken,
+        });
+      }
       console.log('noti push sended');
 
     });
