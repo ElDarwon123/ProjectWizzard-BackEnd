@@ -42,34 +42,40 @@ export class ConvocatoriaService {
     const newCon = new this.convocatoriaModel(createConvocatoriaDto);
     const emails = this.userService.findAllEmailsRegistered();
 
-    const fileUploads = file.map(async (file) => {
-      const fileBuffer = file.buffer;
-      const fileDestination = `convocatoria/${newCon._id}/${file.originalname}`;
-      const fileMymeType = file.mimetype;
-      if (!fileBuffer && !fileDestination && !fileMymeType) {
-        throw new BadRequestException('Invalid file upload');
-      }
-      await this.firebaseService.uploadFile(
-        fileBuffer,
-        fileDestination,
-        fileMymeType,
-      );
-
-      const filesUrls = [];
-      const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(fileDestination)}?alt=media`;
-      filesUrls.push(fileUrl);
-      newCon.files.push(fileUrl);
-      return newCon.save();
-    });
+    if (file) {
+      const fileUploads = file.map(async (file) => {
+        const fileBuffer = file.buffer;
+        const fileDestination = `convocatoria/${newCon._id}/${file.originalname}`;
+        const fileMymeType = file.mimetype;
+        if (!fileBuffer && !fileDestination && !fileMymeType) {
+          throw new BadRequestException('Invalid file upload');
+        }
+        await this.firebaseService.uploadFile(
+          fileBuffer,
+          fileDestination,
+          fileMymeType,
+        );
+  
+        const filesUrls = [];
+        const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${this.configService.get<string>('FIREBASE_URL')}/o/${encodeURIComponent(fileDestination)}?alt=media`;
+        filesUrls.push(fileUrl);
+        newCon.files.push(fileUrl);
+        await Promise.all(fileUploads);
+        return newCon.save();
+        
+      });
+    }
 
     //  Notification body
     // Send Email notification
     (await emails).forEach((email) => {
-      this.authService.sendAnnouncementEmailNoti(
-        email.email,
-        newCon.title,
-        newCon.descripcion,
-      );
+      if (email !== null || " " || "") {
+        this.authService.sendAnnouncementEmailNoti(
+          email.email,
+          newCon.title,
+          newCon.descripcion,
+        );
+      }
     });
 
     const title = 'Nueva convocatoria!';
@@ -83,19 +89,19 @@ export class ConvocatoriaService {
 
     (await emails).forEach(async (email) => {
       const user = await this.userService.findOne(email.id);
-      if (!user.deviceToken || user.deviceToken === null) {
-        console.log('device token not found');
+      if (user.deviceToken || user.deviceToken !== null) {
+        await this.firebaseService.sendPushNotification({
+          body: body,
+          title: title,
+          token: user.deviceToken,
+        });
+        console.log('noti push sended');
       }
-      await this.firebaseService.sendPushNotification({
-        body: body,
-        title: title,
-        token: user.deviceToken,
-      });
-      console.log('noti push sended');
+      
 
     });
 
-    await Promise.all(fileUploads);
+    
     return newCon;
   }
 
