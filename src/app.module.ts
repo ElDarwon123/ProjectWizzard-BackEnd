@@ -40,6 +40,7 @@ import { SharedModule } from './shared.module';
           host: configService.get<string>('MAIL_HOST'),
           port: 587, // El puerto estándar para SMTP de Gmail
           secure: false, // Usar TLS
+          
           auth: {
             user: configService.get<string>('MAIL_USER'),
             pass: configService.get<string>('MAIL_PASSWORD'),
