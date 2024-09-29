@@ -68,11 +68,14 @@ export class ConvocatoriaService {
     //  Notification body
     // Send Email notification
     (await emails).forEach((email) => {
-      this.authService.sendAnnouncementEmailNoti(
-        email.email,
-        newCon.title,
-        newCon.descripcion,
-      );
+      if (email !== null || " " || "" ) {
+        this.authService.sendAnnouncementEmailNoti(
+          email.email,
+          newCon.title,
+          newCon.descripcion,
+        );
+      }
+      
     });
 
     const title = 'Nueva convocatoria!';
